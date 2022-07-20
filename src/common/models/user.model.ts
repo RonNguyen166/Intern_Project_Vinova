@@ -1,9 +1,15 @@
 import mongoose from "mongoose";
 import bcrypt from "bcrypt";
-interface IUser {
-  name: String;
-  email: String;
-  password: String;
+import express from "express";
+export interface IUser {
+  name: string;
+  email: string;
+  password: string;
+  correctPassword: Function;
+  isModified: Function;
+  createdAt: Date;
+  updatedAt: Date;
+  _id: mongoose.Schema.Types.ObjectId;
 }
 
 const schema: mongoose.Schema = new mongoose.Schema<IUser>(
@@ -15,6 +21,7 @@ const schema: mongoose.Schema = new mongoose.Schema<IUser>(
     email: {
       type: String,
       required: [true, "Email cannot be empty"],
+      unique: true,
     },
     password: {
       type: String,
@@ -24,8 +31,19 @@ const schema: mongoose.Schema = new mongoose.Schema<IUser>(
   { timestamps: true }
 );
 
-schema.methods.comparePassword = function (password: string) {
-  return bcrypt.compareSync(password, this.hash_password);
+schema.pre<IUser>("save", async function (next: any) {
+  if (!this.isModified("password")) return next();
+
+  this.password = await bcrypt.hash(this.password, 12);
+
+  return next();
+});
+
+schema.methods.correctPassword = async function (
+  candidatePassword: string,
+  userPassword: string
+) {
+  return await bcrypt.compare(candidatePassword, userPassword);
 };
 
 export const User: mongoose.Model<IUser> = mongoose.model<IUser>(

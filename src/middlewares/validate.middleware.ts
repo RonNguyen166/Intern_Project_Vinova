@@ -8,6 +8,7 @@ class CommonValidator {
         return next();
       }
       console.log(schema.validate(req.body));
+      //console.log("hello world");
       return res.status(400).json({
         status: "error",
         message: error,
