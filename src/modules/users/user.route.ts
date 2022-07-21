@@ -24,8 +24,8 @@ router
   .route("/signup")
   .post(
     commonValidator.validate(userJoiSchema.createSchema),
-    authenticator.signUp
+    userController.signUp
   );
 
-router.route("/login").post(authenticator.login);
+router.route("/login").post(userController.login);
 export default router;

@@ -20,9 +20,22 @@ mongoose
 
 app.use(express.json());
 
+/*
 app.use(
   (req: express.Request, res: express.Response, next: express.NextFunction) => {
     console.log(req.headers);
+    return next();
+  }
+);
+*/
+
+/*
+test console.log middleware
+*/
+app.use(
+  (req: express.Request, res: express.Response, next: express.NextFunction) => {
+    console.log(req.query);
+    console.log({ ...req.query });
     return next();
   }
 );

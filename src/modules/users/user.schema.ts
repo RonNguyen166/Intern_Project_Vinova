@@ -1,8 +1,8 @@
 import joi from "joi";
-class joiSchema {
-  nameRegex: RegExp = /^[a-zA-Z\s]+$/i;
-  passwordRegex: RegExp = /[a-zA-Z0-9]/;
-  createSchema: joi.ObjectSchema = joi.object({
+export default class JoiSchema {
+  private nameRegex: RegExp = /^[a-zA-Z\s]+$/i;
+  private passwordRegex: RegExp = /[a-zA-Z0-9]/;
+  public createSchema: joi.ObjectSchema = joi.object({
     name: joi
       .string()
       .pattern(new RegExp(this.nameRegex))
@@ -17,7 +17,7 @@ class joiSchema {
       .required(),
     email: joi.string().email().required(),
   });
-  updateSchema: joi.ObjectSchema = joi.object({
+  public updateSchema: joi.ObjectSchema = joi.object({
     name: joi.string().pattern(new RegExp(this.nameRegex)).min(1).max(100),
     password: joi
       .string()
@@ -27,5 +27,3 @@ class joiSchema {
     email: joi.string().email(),
   });
 }
-
-export default joiSchema;
