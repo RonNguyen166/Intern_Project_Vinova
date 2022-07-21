@@ -20,7 +20,7 @@ export default class Authenticator {
     if (!token) {
       return res.status(401).json({
         status: "error",
-        message: "PLease log in to get access",
+        message: "Please log in to get access",
       });
     }
     try {

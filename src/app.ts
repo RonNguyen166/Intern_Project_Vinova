@@ -32,6 +32,8 @@ app.use(
 /*
 test console.log middleware
 */
+
+/*
 app.use(
   (req: express.Request, res: express.Response, next: express.NextFunction) => {
     console.log(req.query);
@@ -39,6 +41,7 @@ app.use(
     return next();
   }
 );
+*/
 
 const combineRoute = new CombineRoute();
 
