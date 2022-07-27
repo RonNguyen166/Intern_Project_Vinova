@@ -1,52 +1,34 @@
-import express from "express";
-import dotenv from "dotenv";
-import mongoose from "mongoose";
+import express, { Application, NextFunction, Request, Response } from "express";
+import mongoose, { ConnectOptions } from "mongoose";
 import CombineRoute from "./modules/index";
+import "dotenv/config";
+import config from "./config/config";
+import { ErrorMessages, ErrorResponsesCode } from "./utils/constants";
+import { errorConverter, errorHandler } from "./middlewares/error.middleware";
+import AppError from "./utils/AppError";
 
-dotenv.config({ path: "./config.env" });
-
-const app: express.Express = express();
-
-const DB: string | undefined = process.env.DATABASE?.replace(
-  "<PASSWORD>",
-  process.env.PASSWORD as string
-);
 mongoose
-  .connect(DB as string)
-  .then((data) => {
-    console.log("Successfully connected to database");
+  .connect(
+    process.env.MONGO_URL!.replace("<PASSWORD>", process.env.PASSWORD!),
+    {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    } as ConnectOptions
+  )
+  .then(async () => {
+    const app: Application = express();
+    const port = process.env.PORT || 6000;
+    config(app);
+    const combineRoute = new CombineRoute();
+    combineRoute.start(app);
+    app.get("*", function (req: Request, res: Response, next: NextFunction) {
+      next(new AppError(ErrorResponsesCode.NOT_FOUND, ErrorMessages.NOT_FOUND));
+    });
+
+    app.use(errorConverter);
+    app.use(errorHandler);
+    app.listen(port, () =>
+      console.log(`Server is running on ${port} at http://localhost:6000`)
+    );
   })
-  .catch((err) => console.log("Error connected to database: ", err));
-
-app.use(express.json());
-
-/*
-app.use(
-  (req: express.Request, res: express.Response, next: express.NextFunction) => {
-    console.log(req.headers);
-    return next();
-  }
-);
-*/
-
-/*
-test console.log middleware
-*/
-
-/*
-app.use(
-  (req: express.Request, res: express.Response, next: express.NextFunction) => {
-    console.log(req.query);
-    console.log({ ...req.query });
-    return next();
-  }
-);
-*/
-
-const combineRoute = new CombineRoute();
-
-app.use("/api/users", combineRoute.userRouter);
-
-app.listen(process.env.PORT || 6000, () => {
-  console.log(`App running on port ${process.env.PORT}`);
-});
+  .catch((err) => console.log("Cannot connect to database. Error: ", err));

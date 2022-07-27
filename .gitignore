@@ -1,3 +1,2 @@
-node_modules/
-config.env
-apiFeatures.ts
+node_modules
+.env

@@ -1,19 +1,20 @@
 import { Request, Response, NextFunction } from "express";
-import joi from "joi";
-class CommonValidator {
-  validate = function (schema: joi.ObjectSchema) {
-    return function (req: Request, res: Response, next: NextFunction) {
-      const { value, error } = schema.validate(req.body);
-      if (!error) {
-        return next();
-      }
-      console.log(schema.validate(req.body));
-      //console.log("hello world");
-      return res.status(400).json({
-        status: "error",
-        message: error,
-      });
-    };
+import { ObjectSchema } from "joi";
+import AppError from "../utils/AppError";
+import { ErrorResponsesCode } from "../utils/constants";
+import pick from "../utils/pick";
+
+export default (schema: ObjectSchema) =>
+  (req: Request, res: Response, next: NextFunction) => {
+    const validSchema = pick(schema, ["params", "query", "body"]);
+    const { value, error } = schema.validate(validSchema);
+
+    if (error) {
+      const errorMessage: string = error.details
+        .map((details) => details.message)
+        .join(", ");
+      return next(new AppError(ErrorResponsesCode.BAD_REQUEST, errorMessage));
+    }
+    Object.assign(req, value);
+    return next();
   };
-}
-export default CommonValidator;

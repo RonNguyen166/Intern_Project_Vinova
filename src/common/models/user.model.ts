@@ -1,52 +1,78 @@
-import mongoose from "mongoose";
 import bcrypt from "bcrypt";
-import express from "express";
-export interface IUser {
-  name: string;
+import { Document, Schema, model, SchemaTypes } from "mongoose";
+import { Roles } from "../../utils/constants";
+import { SchemaBase, IBase } from "./base.model";
+import pointModel, { IPoint } from "./point.model";
+export interface IUser extends IBase {
+  fullName: string;
+  subName: string;
+  alias: string;
+  team: string;
   email: string;
   password: string;
+  passwordConfirm: string;
+  gender: boolean;
+  dob: Date;
+  country: string;
+  photo: string;
+  role: Roles;
+  point: IPoint;
   correctPassword: Function;
-  isModified: Function;
-  createdAt: Date;
-  updatedAt: Date;
-  _id: mongoose.Schema.Types.ObjectId;
 }
 
-const schema: mongoose.Schema = new mongoose.Schema<IUser>(
-  {
-    name: {
+const UserSchema: Schema = new Schema<IUser>(
+  SchemaBase({
+    fullName: {
       type: String,
-      required: [true, "Name cannot be empty"],
+      required: true,
     },
+    subName: String,
+    alias: String,
     email: {
       type: String,
-      required: [true, "Email cannot be empty"],
+      required: true,
+      trim: true,
       unique: true,
     },
+    team: String,
     password: {
       type: String,
-      required: [true, "Please provide a password"],
+      required: true,
     },
-  },
-  { timestamps: true }
+    passwordConfirm: {
+      type: String,
+      required: true,
+    },
+    gender: Boolean,
+    country: String,
+    photo: {
+      type: String,
+      default: "default.png",
+    },
+    role: {
+      type: String,
+      enum: Roles,
+      default: Roles.Menber,
+    },
+    point: pointModel.schema,
+  }),
+  { timestamps: { createdAt: "created_at", updatedAt: "updated_at" } }
 );
 
-schema.pre<IUser>("save", async function (next: any) {
+UserSchema.index({ fullName: 1, alias: 1 });
+
+UserSchema.pre<IUser>("save", async function (next: any): Promise<void> {
   if (!this.isModified("password")) return next();
-
   this.password = await bcrypt.hash(this.password, 12);
-
+  this.passwordConfirm = "";
   return next();
 });
 
-schema.methods.correctPassword = async function (
+UserSchema.methods.correctPassword = async function (
   candidatePassword: string,
   userPassword: string
-) {
+): Promise<Error | boolean> {
   return await bcrypt.compare(candidatePassword, userPassword);
 };
 
-export const User: mongoose.Model<IUser> = mongoose.model<IUser>(
-  "User",
-  schema
-);
+export default model<IUser>("Users", UserSchema);

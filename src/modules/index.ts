@@ -1,5 +1,9 @@
-import express from "express";
-import UserRouter from "./users/user.route";
+import express, { Application } from "express";
+import UserRouter from "./User/user.route";
 export default class CombineRoute {
-  userRouter: express.Router = UserRouter;
+  private userRoute = new UserRouter();
+
+  public start(app: Application) {
+    app.use("/v1", this.userRoute.router);
+  }
 }
