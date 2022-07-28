@@ -88,7 +88,7 @@ export default class UserService extends BaseRepository<IUser> {
 
   async updateUser(userId: any, data: object) {
     try {
-      const user = await this.update({ id: userId }, data);
+      const user = await this.update({ _id: userId }, data);
       if (!user) {
         throw new AppError(404, "User not Exist");
       }
@@ -99,7 +99,7 @@ export default class UserService extends BaseRepository<IUser> {
   }
   async deleteUser(userId: any) {
     try {
-      const user = await this.delete({ id: userId });
+      const user = await this.delete({ _id: userId });
       if (!user) {
         throw new AppError(404, "User not Exist");
       }
