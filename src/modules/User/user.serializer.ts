@@ -15,6 +15,7 @@ export interface IResponseUser {
   photo: string;
   point: IPoint;
   role: Roles;
+  isEmailVerified: boolean;
   created_by: string;
   updated_by: string;
   created_at: Date;
@@ -34,6 +35,7 @@ export interface IResultUser {
   givePoint: number;
   redeemPoint: number;
   role: Roles;
+  isEmailVerified: boolean;
 }
 
 export function serializerUser(model: any): IResponseUser {
@@ -51,6 +53,7 @@ export function serializerUser(model: any): IResponseUser {
     photo: model.photo,
     point: model.point,
     role: model.role,
+    isEmailVerified: model.isEmailVerified,
     created_by: model.created_by,
     updated_by: model.updated_by,
     created_at: model.created_at,
@@ -70,8 +73,9 @@ export function serializerGetUser(model: any): IResultUser {
     dob: model.dob,
     country: model.country,
     photo: model.photo,
-    givePoint: model.point.givePoint,
-    redeemPoint: model.point.redeemPoint,
+    givePoint: model.point?.givePoint,
+    redeemPoint: model.point?.redeemPoint,
     role: model.role,
+    isEmailVerified: model.isEmailVerified,
   };
 }

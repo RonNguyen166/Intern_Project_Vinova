@@ -1,51 +1,75 @@
-// import express from "express";
-// import jwt from "jsonwebtoken";
-// import { User, IUser } from "./../common/models/user.model";
+import { NextFunction, Request, Response } from "express";
+import catchAsync from "../utils/catchAsync";
+import Token from "../utils/token";
+import UserService from "../modules/User/user.services";
+import User, { IUser } from "../common/models/user.model";
+import { serializerGetUser } from "../modules/User/user.serializer";
+import { ErrorResponsesCode } from "../utils/constants";
+import AppError from "../utils/appError";
 
-// export default class Authenticator {
-//   protect = async (
-//     req: express.Request,
-//     res: express.Response,
-//     next: express.NextFunction
-//   ) => {
-//     let token;
+const isAuthen = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const authHeader: string = <string>req.headers["authorization"];
+    const token: string = authHeader && authHeader.split(" ")[1];
+    const decoded = await new Token().verifyToken(token);
+    const user = await new UserService(User).getUser({ _id: decoded.sub });
+    (<any>req).authenticatedUser = serializerGetUser(user);
+    next();
+  }
+);
 
-//     if (
-//       req.headers.authorization &&
-//       req.headers.authorization.startsWith("Bearer")
-//     ) {
-//       token = req.headers.authorization.split(" ")[1];
-//     }
+const permission =
+  (...roles: string[]) =>
+  (req: Request, res: Response, next: NextFunction) => {
+    if (!roles.includes((<any>req).authenticatedUser.role)) {
+      return next(
+        new AppError(
+          ErrorResponsesCode.FORBIDDEN,
+          "You do not have permission to perform this action."
+        )
+      );
+    } else {
+      (<any>req).authorizedUser = (<any>req).authorizatedUser;
+      next();
+    }
+  };
 
-//     if (!token) {
-//       return res.status(401).json({
-//         status: "error",
-//         message: "Please log in to get access",
-//       });
-//     }
-//     try {
-//       const decoded = (await jwt.verify(token, process.env.JWT_SECRET)) as any;
-//       const currentUser = User.findById(decoded.id);
+const verifyCallback =
+  (req: Request, resolve: any, reject: any, roles: string[]) =>
+  async (err?: Error, user?: IUser) => {
+    if (err || !user) {
+      return reject(
+        new AppError(ErrorResponsesCode.UNAUTHORIZED, "Please authenticate")
+      );
+    }
+    (<any>req).authenticatedUser = serializerGetUser(user);
+    if (roles.length && !roles.includes((<any>req).authenticatedUser.role)) {
+      return reject(
+        new AppError(
+          ErrorResponsesCode.FORBIDDEN,
+          "You do not have permission to perform this action."
+        )
+      );
+    }
+    resolve();
+  };
 
-//       if (!currentUser) {
-//         return res.status(401).json({
-//           status: "error",
-//           message: "No user with this token was found",
-//         });
-//       }
+const auth =
+  (...roles: string[]) =>
+  async (req: Request, res: Response, next: NextFunction) => {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const authHeader: string = <string>req.headers["authorization"];
+        const token: string = authHeader && authHeader.split(" ")[1];
+        const decoded = await new Token().verifyToken(token);
+        const user = await new UserService(User).getUser({ _id: decoded.sub });
+        await verifyCallback(req, resolve, reject, roles)(undefined, user);
+      } catch (err: any) {
+        await verifyCallback(req, resolve, reject, roles)(err, undefined);
+      }
+    })
+      .then(() => next())
+      .catch((err) => next(err));
+  };
 
-//       /*
-//       #TODO: change password after...
-//       */
-
-//       //(<any>req).user = currentUser;
-//       req.user = currentUser;
-//       return next();
-//     } catch (err) {
-//       res.status(401).json({
-//         status: "error",
-//         message: "Invalid token!!!",
-//       });
-//     }
-//   };
-// }
+export { isAuthen, permission, auth };

@@ -18,6 +18,7 @@ export interface IUser extends IBase {
   role: Roles;
   point: IPoint;
   correctPassword: Function;
+  isEmailTaken: Function;
 }
 
 const UserSchema: Schema = new Schema<IUser>(
@@ -55,6 +56,10 @@ const UserSchema: Schema = new Schema<IUser>(
       default: Roles.Menber,
     },
     point: pointModel.schema,
+    isEmailVerified: {
+      type: Boolean,
+      default: false,
+    },
   }),
   { timestamps: { createdAt: "created_at", updatedAt: "updated_at" } }
 );
@@ -69,10 +74,14 @@ UserSchema.pre<IUser>("save", async function (next: any): Promise<void> {
 });
 
 UserSchema.methods.correctPassword = async function (
-  candidatePassword: string,
-  userPassword: string
+  password: string
 ): Promise<Error | boolean> {
-  return await bcrypt.compare(candidatePassword, userPassword);
+  return await bcrypt.compare(password, this.password);
+};
+
+UserSchema.statics.isEmailTaken = async function (email: string) {
+  const user = await this.findOne({ email });
+  return !!user;
 };
 
 export default model<IUser>("Users", UserSchema);

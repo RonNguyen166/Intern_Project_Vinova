@@ -2,7 +2,9 @@ import mongoose, { Model } from "mongoose";
 import { getTextOfJSDocComment } from "typescript";
 import User, { IUser } from "../../common/models/user.model";
 import { BaseRepository } from "../../common/repository/base.repository";
-import AppError from "../../utils/AppError";
+import AppError from "../../utils/appError";
+import { ErrorResponsesCode } from "../../utils/constants";
+import { IUpdatePassword } from "./user.interface";
 export default class UserService extends BaseRepository<IUser> {
   constructor(public readonly userRepository: Model<IUser>) {
     super(userRepository);
@@ -11,7 +13,7 @@ export default class UserService extends BaseRepository<IUser> {
     try {
       const users = await this.getAll();
       if (!users) {
-        throw new AppError(404, "User not Exist");
+        throw new AppError(ErrorResponsesCode.NOT_FOUND, "User not Exist");
       }
       return users;
     } catch (err) {
@@ -54,7 +56,7 @@ export default class UserService extends BaseRepository<IUser> {
         .exec();
       totalRows = await User.countDocuments(finalFilter).exec();
       if (!users) {
-        throw new AppError(404, "User not Exist");
+        throw new AppError(ErrorResponsesCode.NOT_FOUND, "User not Exist");
       }
       return {
         data: users,
@@ -65,11 +67,11 @@ export default class UserService extends BaseRepository<IUser> {
     }
   }
 
-  async getUser(userId: any): Promise<any> {
+  async getUser(filter: any): Promise<any> {
     try {
-      const user = await this.getOne({ _id: userId });
+      const user = await this.getOne(filter);
       if (!user) {
-        throw new AppError(404, "User not Exist");
+        throw new AppError(ErrorResponsesCode.NOT_FOUND, "User not Exist");
       }
       return user;
     } catch (err) {
@@ -88,9 +90,9 @@ export default class UserService extends BaseRepository<IUser> {
 
   async updateUser(userId: any, data: object) {
     try {
-      const user = await this.update({ id: userId }, data);
+      const user = await this.update(userId, data);
       if (!user) {
-        throw new AppError(404, "User not Exist");
+        throw new AppError(ErrorResponsesCode.NOT_FOUND, "User not Exist");
       }
       return user;
     } catch (err) {
@@ -99,13 +101,34 @@ export default class UserService extends BaseRepository<IUser> {
   }
   async deleteUser(userId: any) {
     try {
-      const user = await this.delete({ id: userId });
+      const user = await this.delete(userId);
       if (!user) {
-        throw new AppError(404, "User not Exist");
+        throw new AppError(ErrorResponsesCode.NOT_FOUND, "User not Exist");
       }
       return user;
     } catch (err) {
       throw err;
     }
+  }
+  async updatePassword(user: IUser, data: IUpdatePassword) {
+    user = await this.getOne({ _id: user._id });
+    if (!user)
+      throw new AppError(ErrorResponsesCode.NOT_FOUND, "User not found");
+    const { passwordCurrent, password, passwordConfirm } = data;
+    if (!password || !passwordCurrent || !passwordConfirm)
+      throw new AppError(
+        ErrorResponsesCode.BAD_REQUEST,
+        "Please provide full fill"
+      );
+    const isMatch = await user.correctPassword(passwordCurrent);
+    if (!isMatch) {
+      throw new AppError(
+        ErrorResponsesCode.UNAUTHORIZED,
+        "Your current password is wrong."
+      );
+    }
+    user.password = password;
+    user.passwordConfirm = passwordConfirm;
+    return await user.save();
   }
 }

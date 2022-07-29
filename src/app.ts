@@ -5,7 +5,7 @@ import "dotenv/config";
 import config from "./config/config";
 import { ErrorMessages, ErrorResponsesCode } from "./utils/constants";
 import { errorConverter, errorHandler } from "./middlewares/error.middleware";
-import AppError from "./utils/AppError";
+import AppError from "./utils/appError";
 
 mongoose
   .connect(
@@ -21,7 +21,7 @@ mongoose
     config(app);
     const combineRoute = new CombineRoute();
     combineRoute.start(app);
-    app.get("*", function (req: Request, res: Response, next: NextFunction) {
+    app.use("*", function (req: Request, res: Response, next: NextFunction) {
       next(new AppError(ErrorResponsesCode.NOT_FOUND, ErrorMessages.NOT_FOUND));
     });
 

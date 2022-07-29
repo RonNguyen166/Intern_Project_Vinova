@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 import { Request, Response, NextFunction } from "express";
-import AppError from "../utils/AppError";
+import AppError from "../utils/appError";
 import { ErrorMessages, ErrorResponsesCode } from "../utils/constants";
 import { errorReponse } from "../common/services/response.sevice";
 

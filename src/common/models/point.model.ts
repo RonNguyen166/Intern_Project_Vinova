@@ -10,11 +10,9 @@ const PointSchema = new Schema<IPoint>(
   SchemaBase({
     givePoint: {
       type: Number,
-      required: true,
     },
     redeemPoint: {
       type: Number,
-      required: true,
     },
   }),
   {
