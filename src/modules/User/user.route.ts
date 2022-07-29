@@ -11,14 +11,14 @@ export default class UserRoute {
   }
   public intializeRoute(): void {
     this.router
-      .route(`/:id`)
+      .route("/:id")
       .get(validate(getOne), this.userController.getUser)
       .patch(validate(updateOne), this.userController.updateUser)
       .delete(validate(deleteOne), this.userController.deleteUser);
 
     this.router
       .use(auth())
-      .route(`/`)
+      .route("/")
       .get(validate(getAll), this.userController.getAllUsers)
       .post(validate(create), this.userController.createUser);
   }

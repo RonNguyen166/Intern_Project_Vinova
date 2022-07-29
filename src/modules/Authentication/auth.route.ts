@@ -18,29 +18,29 @@ export default class AuthRoute {
     this.intializeRoute();
   }
 
-  public intializeRoute(): any {
+  public intializeRoute() {
     this.router
-      .post(`/register`, validate(register), this.authController.register)
-      .post(`/login`, validate(login), this.authController.login)
-      .post(`/logout`, this.authController.logout)
+      .post("/register", validate(register), this.authController.register)
+      .post("/login", validate(login), this.authController.login)
+      .post("/logout", this.authController.logout)
       .post(
-        `/forgot-password`,
+        "/forgot-password",
         validate(forgotPassword),
         this.authController.forgotPassword
       )
       .post(
-        `/reset-password`,
+        "/reset-password",
         validate(resetPassword),
         this.authController.resetPassword
       )
-      .post(`/refresh-tokens`, this.authController.refreshToken)
+      .post("/refresh-tokens", this.authController.refreshToken)
       .post(
-        `/send-verification-email`,
+        "/send-verification-email",
         auth(),
         this.authController.sendVerificationEmail
       )
       .get(
-        `/verify-email`,
+        "/verify-email",
         validate(verifyEmail),
         this.authController.verifyEmail
       )
@@ -50,7 +50,5 @@ export default class AuthRoute {
         validate(updatePassword),
         this.authController.updateAuthPassword
       );
-
-    return this.router;
   }
 }
