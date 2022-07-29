@@ -57,4 +57,23 @@ const verifyEmail = Joi.object({
   }),
 });
 
-export { register, login, forgotPassword, resetPassword, verifyEmail };
+const updatePassword = Joi.object({
+  body: Joi.object().keys({
+    passwordCurrent: Joi.string().required(),
+    password: Joi.string().required().custom(password),
+    passwordConfirm: Joi.any()
+      .equal(Joi.ref("password"))
+      .required()
+      .label("Confirm password")
+      .messages({ "any.only": "{{#label}} does not match" }),
+  }),
+});
+
+export {
+  register,
+  login,
+  forgotPassword,
+  resetPassword,
+  verifyEmail,
+  updatePassword,
+};

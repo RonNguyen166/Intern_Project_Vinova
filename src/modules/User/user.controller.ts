@@ -3,7 +3,7 @@ import UserService from "./user.services";
 import { serializerUser, serializerGetUser } from "./user.serializer";
 import { successReponse } from "../../common/services/response.sevice";
 import User from "../../common/models/user.model";
-import { IUpdatePassword, IUserGet, IUserUpdate } from "./user.interface";
+import { IUserGet, IUserUpdate } from "./user.interface";
 import catchAsync from "../../utils/catchAsync";
 
 export default class UserController {
@@ -56,10 +56,7 @@ export default class UserController {
   public updateUser = catchAsync(async (req: Request, res: Response) => {
     const dataBody: IUserUpdate = { ...req.body };
 
-    const result = await this.userService.updateUser(
-      { _id: req.params.id },
-      dataBody
-    );
+    const result = await this.userService.updateUser(req.params.id, dataBody);
     const resultData: object = {
       user: serializerGetUser(result),
     };
@@ -67,16 +64,7 @@ export default class UserController {
   });
 
   public deleteUser = catchAsync(async (req: Request, res: Response) => {
-    await this.userService.deleteUser({ _id: req.params.id });
+    await this.userService.deleteUser(req.params.id);
     return successReponse(req, res, { isDelete: true }, "Updated Succesfully");
-  });
-
-  public updatePassword = catchAsync(async (req: Request, res: Response) => {
-    const data: IUpdatePassword = req.body;
-    const result = this.userService.updatePassword((<any>req).user, data);
-    const resultData: object = {
-      user: serializerGetUser(result),
-    };
-    return successReponse(req, res, resultData, "Updated Succesfully");
   });
 }

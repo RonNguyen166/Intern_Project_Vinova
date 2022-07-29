@@ -1,13 +1,16 @@
 import User, { IUser } from "../../common/models/user.model";
-import { IRegister, ILogin, IResetPassword, IReponse } from "./auth.interface";
+import {
+  IRegister,
+  ILogin,
+  IResetPassword,
+  IReponse,
+  IUpdatePassword,
+} from "./auth.interface";
 import Token from "../../utils/token";
 import AppError from "../../utils/appError";
 import { ErrorResponsesCode } from "../../utils/constants";
 import UserService from "../User/user.services";
-
 import Email from "../../utils/email";
-import { serializerGetUser } from "../User/user.serializer";
-import mongoose from "mongoose";
 
 export default class AuthService {
   private token: Token = new Token();
@@ -17,7 +20,7 @@ export default class AuthService {
   public async register(data: IRegister): Promise<IReponse> {
     const user = await this.userService.createUser(data);
     const tokens = this.token.generateAuthTokens(user);
-    return { user: serializerGetUser(user), tokens };
+    return { user, tokens };
   }
 
   public async login(data: ILogin): Promise<IReponse> {
@@ -36,7 +39,12 @@ export default class AuthService {
       );
     }
     const tokens = this.token.generateAuthTokens(user);
-    return { user: serializerGetUser(user), tokens };
+    return { user, tokens };
+  }
+
+  async logout(refreshToken: string) {
+    if (!refreshToken)
+      throw new AppError(ErrorResponsesCode.BAD_REQUEST, "Logout Failed");
   }
 
   async refreshAuth(refreshToken: string) {
@@ -71,6 +79,7 @@ export default class AuthService {
       const { password, passwordConfirm } = data;
       const decoded = await this.token.verifyToken(token);
       const user: IUser = await this.userService.getUser({ _id: decoded.sub });
+
       if (!user) throw new Error();
       user.password = password;
       user.passwordConfirm = passwordConfirm;
@@ -103,5 +112,19 @@ export default class AuthService {
     }
     const verifyEmailToken = this.token.generateVerifyEmailToken(user);
     await this.email.sendVerificationEmail(user.email, verifyEmailToken);
+  }
+
+  async updatePassword(user: IUser, data: IUpdatePassword) {
+    user = await this.userService.getUser({ _id: user._id });
+    const { passwordCurrent, password, passwordConfirm } = data;
+    if (!(await user.correctPassword(passwordCurrent))) {
+      throw new AppError(
+        ErrorResponsesCode.UNAUTHORIZED,
+        "Your current password is wrong."
+      );
+    }
+    user.password = password;
+    user.passwordConfirm = passwordConfirm;
+    return await user.save();
   }
 }

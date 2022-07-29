@@ -26,3 +26,8 @@ export interface IReponse {
     refreshToken: string;
   };
 }
+export interface IUpdatePassword {
+  passwordCurrent: string;
+  password: string;
+  passwordConfirm: string;
+}

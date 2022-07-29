@@ -47,9 +47,3 @@ export interface IUserGet {
   sortBy?: string;
   orderBy?: string;
 }
-
-export interface IUpdatePassword {
-  passwordCurrent: string;
-  password: string;
-  passwordConfirm: string;
-}

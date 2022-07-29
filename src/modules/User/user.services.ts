@@ -1,10 +1,9 @@
-import mongoose, { Model } from "mongoose";
-import { getTextOfJSDocComment } from "typescript";
+import { Model } from "mongoose";
 import User, { IUser } from "../../common/models/user.model";
 import { BaseRepository } from "../../common/repository/base.repository";
 import AppError from "../../utils/appError";
 import { ErrorResponsesCode } from "../../utils/constants";
-import { IUpdatePassword } from "./user.interface";
+
 export default class UserService extends BaseRepository<IUser> {
   constructor(public readonly userRepository: Model<IUser>) {
     super(userRepository);
@@ -90,7 +89,7 @@ export default class UserService extends BaseRepository<IUser> {
 
   async updateUser(userId: any, data: object) {
     try {
-      const user = await this.update(userId, data);
+      const user = await this.update({ _id: userId }, data);
       if (!user) {
         throw new AppError(ErrorResponsesCode.NOT_FOUND, "User not Exist");
       }
@@ -101,7 +100,7 @@ export default class UserService extends BaseRepository<IUser> {
   }
   async deleteUser(userId: any) {
     try {
-      const user = await this.delete(userId);
+      const user = await this.delete({ _id: userId });
       if (!user) {
         throw new AppError(ErrorResponsesCode.NOT_FOUND, "User not Exist");
       }
@@ -109,26 +108,5 @@ export default class UserService extends BaseRepository<IUser> {
     } catch (err) {
       throw err;
     }
-  }
-  async updatePassword(user: IUser, data: IUpdatePassword) {
-    user = await this.getOne({ _id: user._id });
-    if (!user)
-      throw new AppError(ErrorResponsesCode.NOT_FOUND, "User not found");
-    const { passwordCurrent, password, passwordConfirm } = data;
-    if (!password || !passwordCurrent || !passwordConfirm)
-      throw new AppError(
-        ErrorResponsesCode.BAD_REQUEST,
-        "Please provide full fill"
-      );
-    const isMatch = await user.correctPassword(passwordCurrent);
-    if (!isMatch) {
-      throw new AppError(
-        ErrorResponsesCode.UNAUTHORIZED,
-        "Your current password is wrong."
-      );
-    }
-    user.password = password;
-    user.passwordConfirm = passwordConfirm;
-    return await user.save();
   }
 }

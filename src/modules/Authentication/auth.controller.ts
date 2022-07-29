@@ -1,9 +1,15 @@
-import { CookieOptions, Request, Response } from "express";
-import moment, { Moment } from "moment";
+import { Request, Response } from "express";
+import moment from "moment";
 
 import { successReponse } from "../../common/services/response.sevice";
 import catchAsync from "../../utils/catchAsync";
-import { ILogin, IRegister, IResetPassword } from "./auth.interface";
+import { serializerGetUser } from "../User/user.serializer";
+import {
+  ILogin,
+  IRegister,
+  IResetPassword,
+  IUpdatePassword,
+} from "./auth.interface";
 import AuthService from "./auth.services";
 
 export default class AuthController {
@@ -12,7 +18,11 @@ export default class AuthController {
   public register = catchAsync(async (req: Request, res: Response) => {
     const data: IRegister = req.body;
     const result = await this.authService.register(data);
-    return successReponse(req, res, result, "Register Successfully", 201);
+    const resultData: object = {
+      user: serializerGetUser(result.user),
+      tokens: result.tokens,
+    };
+    return successReponse(req, res, resultData, "Register Successfully", 201);
   });
 
   public login = catchAsync(async (req: Request, res: Response) => {
@@ -24,9 +34,15 @@ export default class AuthController {
         .add(process.env.JWT_COOKIE_EXPIRATION_DAYS, "days")
         .toDate(),
     });
-    return successReponse(req, res, result, "Login Successfully");
+    const resultData: object = {
+      user: serializerGetUser(result.user),
+      tokens: result.tokens,
+    };
+
+    return successReponse(req, res, resultData, "Login Successfully");
   });
   public logout = catchAsync(async (req: Request, res: Response) => {
+    await this.authService.logout(req.cookies.refreshToken);
     res.clearCookie("refreshToken");
     return successReponse(req, res, undefined, "Logout Successfully");
   });
@@ -61,9 +77,24 @@ export default class AuthController {
   });
 
   public refreshToken = catchAsync(async (req: Request, res: Response) => {
-    const tokens = await this.authService.refreshAuth(
+    const resultData = await this.authService.refreshAuth(
       (<any>req).cookies.refreshToken
     );
-    return successReponse(req, res, tokens, "Refresh Tokens Successfully");
+    return successReponse(req, res, resultData, "Refresh Tokens Successfully");
   });
+
+  public updateAuthPassword = catchAsync(
+    async (req: Request, res: Response) => {
+      const data: IUpdatePassword = req.body;
+      const result = await this.authService.updatePassword(
+        (<any>req).authenticatedUser,
+        data
+      );
+      console.log(result);
+      const resultData: object = {
+        user: serializerGetUser(result),
+      };
+      return successReponse(req, res, resultData, "Updated Succesfully");
+    }
+  );
 }

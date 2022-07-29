@@ -25,7 +25,7 @@ const create = Joi.object({
     email: Joi.string().required().email(),
     point: Joi.object().keys({
       givePoint: Joi.number().required(),
-      reddemPoint: Joi.number().required(),
+      redeemPoint: Joi.number().required(),
     }),
     password: Joi.string().required().min(6).max(40).custom(password),
     passwordConfirm: Joi.any()
@@ -33,7 +33,7 @@ const create = Joi.object({
       .required()
       .label("Confirm password")
       .messages({ "any.only": "{{#label}} does not match" }),
-    role: Joi.string().valid(Roles).required(),
+    role: Joi.string().valid(Roles),
   }),
 });
 const getAll = Joi.object({
@@ -59,30 +59,26 @@ const updateOne: ObjectSchema = Joi.object({
     id: Joi.string().required(),
   }),
   body: Joi.object().keys({
-    body: Joi.object().keys({
-      fullName: Joi.string(),
-      alias: Joi.string(),
-      team: Joi.string(),
-      gender: Joi.boolean(),
-      dob: Joi.date(),
-      country: Joi.string(),
-      photo: Joi.any(),
-      email: Joi.string().email(),
-      point: Joi.object().keys({
-        givePoint: Joi.number(),
-        reddemPoint: Joi.number(),
-      }),
-      password: Joi.string().min(6).max(40).custom(password),
-      passwordConfirm: Joi.any()
-        .equal(Joi.ref("password"))
-        .required()
-        .label("Confirm password")
-        .messages({ "any.only": "{{#label}} does not match" }),
-      role: Joi.string().valid(Roles),
+    fullName: Joi.string(),
+    alias: Joi.string(),
+    team: Joi.string(),
+    gender: Joi.boolean(),
+    dob: Joi.date(),
+    country: Joi.string(),
+    photo: Joi.any(),
+    email: Joi.string().email(),
+    point: Joi.object().keys({
+      givePoint: Joi.number(),
+      reddemPoint: Joi.number(),
     }),
+    password: Joi.string().min(6).max(40).custom(password),
+    passwordConfirm: Joi.any()
+      .equal(Joi.ref("password"))
+      .label("Confirm password")
+      .messages({ "any.only": "{{#label}} does not match" }),
+    role: Joi.string().valid(Roles),
   }),
 });
-
 const deleteOne: ObjectSchema = Joi.object({
   params: Joi.object().keys({
     id: Joi.string(),
