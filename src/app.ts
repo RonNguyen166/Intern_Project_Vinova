@@ -21,14 +21,16 @@ mongoose
     config(app);
     const combineRoute = new CombineRoute();
     combineRoute.start(app);
+    console.log("Database connection established");
     app.use("*", function (req: Request, res: Response, next: NextFunction) {
       next(new AppError(ErrorResponsesCode.NOT_FOUND, ErrorMessages.NOT_FOUND));
-    });
+    }
+    );
 
     app.use(errorConverter);
     app.use(errorHandler);
     app.listen(port, () =>
-      console.log(`Server is running on ${port} at http://localhost:6000`)
+      console.log(`Server is running on ${port} at http://localhost:${port}`)
     );
   })
   .catch((err) => console.log("Cannot connect to database. Error: ", err));
