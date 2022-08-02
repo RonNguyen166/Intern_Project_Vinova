@@ -24,7 +24,7 @@ export default class UserService extends BaseRepository<IUser> {
       let { page, size, team, role, search, sortBy, orderBy } = filter;
       let _page = page ? parseInt(page) : 1;
       let _size = size ? parseInt(size) : 10;
-      let users, totalRows, finalFilter;
+      let users, totalRows, finalFilter: object;
       const _sortBy: string = sortBy ? sortBy : "created_at";
       const _orderBy: number = orderBy ? parseInt(orderBy) : 1;
       const sorting: any = { [_sortBy]: _orderBy };
@@ -32,13 +32,21 @@ export default class UserService extends BaseRepository<IUser> {
         finalFilter = {
           isDelete: false,
           $text: { $search: `\"` + search + `\"` },
+          team,
+          role,
         };
       } else {
         finalFilter = {
           isDelete: false,
+          team,
+          role,
         };
       }
-      console.log(finalFilter);
+      Object.keys(finalFilter).forEach(
+        (key) =>
+          (<any>finalFilter)[key] === undefined &&
+          delete (<any>finalFilter)[key]
+      );
       users = await User.find(finalFilter)
         .select({ isDelete: 0 })
         .limit(_size)

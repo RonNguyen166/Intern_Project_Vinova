@@ -16,6 +16,7 @@ export interface IResponseUser {
   point: IPoint;
   role: Roles;
   isEmailVerified: boolean;
+  isAdmin: boolean;
   created_by: string;
   updated_by: string;
   created_at: Date;
@@ -32,10 +33,12 @@ export interface IResultUser {
   dob: Date;
   country: string;
   photo: string;
+  photoUrl: string;
   givePoint: number;
   redeemPoint: number;
   role: Roles;
   isEmailVerified: boolean;
+  isAdmin: boolean;
 }
 
 export function serializerUser(model: any): IResponseUser {
@@ -52,8 +55,10 @@ export function serializerUser(model: any): IResponseUser {
     country: model.country,
     photo: model.photo,
     point: model.point,
+
     role: model.role,
     isEmailVerified: model.isEmailVerified,
+    isAdmin: model.isAdmin,
     created_by: model.created_by,
     updated_by: model.updated_by,
     created_at: model.created_at,
@@ -73,9 +78,11 @@ export function serializerGetUser(model: any): IResultUser {
     dob: model.dob,
     country: model.country,
     photo: model.photo,
+    photoUrl: model.photoUrl,
     givePoint: model.point?.givePoint,
     redeemPoint: model.point?.redeemPoint,
     role: model.role,
     isEmailVerified: model.isEmailVerified,
+    isAdmin: model.isAdmin,
   };
 }

@@ -9,7 +9,7 @@ import {
   editProfile,
 } from "./user.schema";
 import UserController from "./user.controller";
-import { auth } from "../../middlewares/authen.middleware";
+import { isAuthen, isAuthor } from "../../middlewares/authen.middleware";
 import { upload } from "../../common/services/upload.service";
 export default class UserRoute {
   public router: Router = Router();
@@ -21,7 +21,7 @@ export default class UserRoute {
     this.router.patch(
       "/edit-profile",
       upload.single("photo"),
-      auth(),
+      isAuthen,
       validate(editProfile),
       this.userController.editProfile
     );
@@ -31,13 +31,15 @@ export default class UserRoute {
       .route("/:id")
       .get(validate(getOne), this.userController.getUser)
       .patch(
-        auth("admin"),
+        isAuthen,
+        isAuthor,
         upload.single("photo"),
         validate(updateOne),
         this.userController.updateUser
       )
       .delete(
-        auth("admin"),
+        isAuthen,
+        isAuthor,
         validate(deleteOne),
         this.userController.deleteUser
       );
@@ -46,7 +48,8 @@ export default class UserRoute {
       .route("/")
       .get(validate(getAll), this.userController.getAllUsers)
       .post(
-        auth("admin"),
+        isAuthen,
+        isAuthor,
         upload.single("photo"),
         validate(create),
         this.userController.createUser

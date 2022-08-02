@@ -3,17 +3,23 @@ import UserService from "./user.services";
 import { serializerUser, serializerGetUser } from "./user.serializer";
 import { successReponse } from "../../common/services/response.service";
 import User from "../../common/models/user.model";
-import { IUserGet, IUserUpdate, IUserProfile } from "./user.interface";
+import {
+  IUserGet,
+  IUserUpdate,
+  IUserProfile,
+  IUserCreate,
+} from "./user.interface";
 import catchAsync from "../../utils/catchAsync";
-import { s3DeleteUpload, s3Upload } from "../../common/services/upload.service";
+import S3Upload from "../../common/services/upload.service";
 
 export default class UserController {
   public userService: UserService = new UserService(User);
-
+  public s3Upload: S3Upload = new S3Upload();
   public createUser = catchAsync(async (req: Request, res: Response) => {
-    const url = await s3Upload(req.file);
+    const url = await this.s3Upload.put(req.file);
     req.body.photo = url;
-    const result = await this.userService.createUser(req.body);
+    const data: IUserCreate = req.body;
+    const result = await this.userService.createUser(data);
     const resultData: object = {
       user: serializerGetUser(result),
     };
@@ -38,7 +44,6 @@ export default class UserController {
     const serializedResults = results?.data.map((ele: any) =>
       ele.id ? serializerGetUser(ele) : serializerUser(ele)
     );
-
     const resultData: object = {
       page: req.query.page ? parseInt(<string>req.query.page) : 1,
       size: req.query.size ? parseInt(<string>req.query.size) : 10,
@@ -50,6 +55,7 @@ export default class UserController {
 
   public getUser = catchAsync(async (req: Request, res: Response) => {
     const result = await this.userService.getUser({ _id: req.params.id });
+    result.photoUrl = await this.s3Upload.get(result.photo);
     const resultData: object = {
       user: serializerGetUser(result),
     };
@@ -58,7 +64,7 @@ export default class UserController {
 
   public updateUser = catchAsync(async (req: Request, res: Response) => {
     if (req.file) {
-      const url = await s3Upload(req.file);
+      const url = await this.s3Upload.put(req.file);
       req.body.photo = url;
     }
     const dataBody: IUserUpdate = { ...req.body };
@@ -71,7 +77,7 @@ export default class UserController {
   });
 
   public editProfile = catchAsync(async (req: Request, res: Response) => {
-    const url = await s3Upload(req.file);
+    const url = await this.s3Upload.put(req.file);
     if (req.file) req.body.photo = url;
     const dataBody: IUserProfile = { ...req.body };
     const result = await this.userService.editProfile(
@@ -86,7 +92,7 @@ export default class UserController {
 
   public deleteUser = catchAsync(async (req: Request, res: Response) => {
     const user = await this.userService.deleteUser(req.params.id);
-    await s3DeleteUpload(user.photo);
+    await this.s3Upload.delete(user.photo);
     return successReponse(req, res, { isDelete: true }, "Deleted Succesfully");
   });
 }

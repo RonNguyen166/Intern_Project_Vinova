@@ -17,6 +17,7 @@ export interface IUser extends IBase {
   photo: string;
   role: Roles;
   point: IPoint;
+  isAdmin: boolean;
   correctPassword: Function;
   isEmailTaken: Function;
 }
@@ -60,6 +61,10 @@ const UserSchema: Schema = new Schema<IUser>(
       type: Boolean,
       default: false,
     },
+    isAdmin: {
+      type: Boolean,
+      default: false,
+    },
   }),
   { timestamps: { createdAt: "created_at", updatedAt: "updated_at" } }
 );
@@ -76,6 +81,12 @@ UserSchema.pre<IUser>("save", async function (next: any): Promise<void> {
   if (!this.isModified("password")) return next();
   this.password = await bcrypt.hash(this.password, 12);
   this.passwordConfirm = "";
+  return next();
+});
+
+UserSchema.pre<IUser>("save", async function (next: any): Promise<void> {
+  if (!this.isModified("role")) return next();
+  this.isAdmin = this.role === "admin";
   return next();
 });
 

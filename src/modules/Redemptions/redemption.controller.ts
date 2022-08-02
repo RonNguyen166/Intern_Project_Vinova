@@ -4,7 +4,7 @@ import express from "express";
 import { IProduct, Product } from "./../../common/models/product.model";
 import mongoose from "mongoose";
 
-export default class RedemptionController {
+export default class RedeemptionController {
   private redemptionService: RedemptionService = new RedemptionService();
 
   public createRedemption = async <RedemptionController>(
@@ -30,7 +30,11 @@ export default class RedemptionController {
       }
 
       redemptionObj.quantity = req.body.quantity;
-      if (req.authenticatedUser == undefined || req.authenticatedUser == null || !req.authenticatedUser) {
+      if (
+        req.authenticatedUser == undefined ||
+        req.authenticatedUser == null ||
+        !req.authenticatedUser
+      ) {
         throw "Please login to get access";
       }
 

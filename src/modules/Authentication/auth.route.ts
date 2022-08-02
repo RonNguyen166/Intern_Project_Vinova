@@ -9,7 +9,7 @@ import {
   updatePassword,
 } from "./auth.schema";
 import AuthController from "./auth.controller";
-import { auth } from "../../middlewares/authen.middleware";
+import { isAuthen } from "../../middlewares/authen.middleware";
 
 export default class AuthRoute {
   public router: Router = Router();
@@ -36,7 +36,7 @@ export default class AuthRoute {
       .post("/refresh-tokens", this.authController.refreshToken)
       .post(
         "/send-verification-email",
-        auth(),
+        isAuthen,
         this.authController.sendVerificationEmail
       )
       .get(
@@ -46,7 +46,7 @@ export default class AuthRoute {
       )
       .patch(
         "/update-password",
-        auth(),
+        isAuthen,
         validate(updatePassword),
         this.authController.updateAuthPassword
       );
