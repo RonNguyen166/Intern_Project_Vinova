@@ -51,8 +51,8 @@ export default class AuthService {
     if (!refreshToken)
       throw new AppError(ErrorResponsesCode.BAD_REQUEST, "Please login now!");
     try {
-      const payload = await this.token.verifyToken(refreshToken);
-      const user: IUser = await this.userService.getUser({ _id: payload.sub });
+      const decoded = await this.token.verifyToken(refreshToken);
+      const user: IUser = await this.userService.getUser({ _id: decoded.sub });
       const tokens = this.token.generateAuthTokens(user);
       return { tokens };
     } catch (error) {

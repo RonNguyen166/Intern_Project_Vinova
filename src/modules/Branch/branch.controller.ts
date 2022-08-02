@@ -1,14 +1,14 @@
 import { Request, Response } from "express";
 import BranchService from "./branch.services";
 import { serializerBranch, serializerGetBranch } from "./branch.serializer";
-import { successReponse } from "../../common/services/response.sevice";
+import { successReponse } from "../../common/services/response.service";
 import Branch from "../../common/models/branch.model";
 import { IBranchGet, IBranchUpdate } from "./branch.interface";
 import catchAsync from "../../utils/catchAsync";
 import { any } from "joi";
 
 export default class BranchController {
-  public branchService: BranchService = new BranchService(Branch)
+  public branchService: BranchService = new BranchService(Branch);
 
   public createBranch = catchAsync(async (req: Request, res: Response) => {
     const result = await this.branchService.createBranch(req.body);
@@ -28,7 +28,6 @@ export default class BranchController {
     };
     return successReponse(req, res, resultData, "Get Successfully");
   });
-
 
   public getBranch = catchAsync(async (req: Request, res: Response) => {
     const filter: object = {

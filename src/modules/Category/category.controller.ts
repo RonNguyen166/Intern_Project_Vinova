@@ -1,14 +1,17 @@
 import { Request, Response } from "express";
 import CategoryService from "./category.services";
-import { serializerCategory, serializerGetCategory } from "./category.serializer";
-import { successReponse } from "../../common/services/response.sevice";
+import {
+  serializerCategory,
+  serializerGetCategory,
+} from "./category.serializer";
+import { successReponse } from "../../common/services/response.service";
 import Category from "../../common/models/category.model";
 import { ICategoryGet, ICategoryUpdate } from "./category.interface";
 import catchAsync from "../../utils/catchAsync";
 import { any } from "joi";
 
 export default class CategoryController {
-  public categoryService: CategoryService = new CategoryService(Category)
+  public categoryService: CategoryService = new CategoryService(Category);
 
   public createCategory = catchAsync(async (req: Request, res: Response) => {
     const result = await this.categoryService.createCategory(req.body);
@@ -28,7 +31,6 @@ export default class CategoryController {
     };
     return successReponse(req, res, resultData, "Get Successfully");
   });
-
 
   public getCategory = catchAsync(async (req: Request, res: Response) => {
     const filter: object = {

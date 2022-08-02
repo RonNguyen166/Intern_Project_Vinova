@@ -34,7 +34,7 @@ import AppError from "../utils/appError";
 //     }
 //   };
 
-const verifyCallback =
+const verifyAuth =
   (req: Request, resolve: any, reject: any, roles: string[]) =>
   async (err?: Error, user?: IUser) => {
     if (err || !user) {
@@ -62,9 +62,9 @@ const auth = (...roles: string[]) =>
         const token: string = authHeader && authHeader.split(" ")[1];
         const decoded = await new Token().verifyToken(token);
         const user = await new UserService(User).getUser({ _id: decoded.sub });
-        await verifyCallback(req, resolve, reject, roles)(undefined, user);
+        await verifyAuth(req, resolve, reject, roles)(undefined, user);
       } catch (err: any) {
-        await verifyCallback(req, resolve, reject, roles)(err, undefined);
+        await verifyAuth(req, resolve, reject, roles)(err, undefined);
       }
     })
       .then(() => next())

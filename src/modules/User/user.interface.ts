@@ -27,22 +27,18 @@ export interface IUserUpdate {
   role?: Roles;
 }
 
-export interface IMyUpdate {
+export interface IUserProfile {
   fullName?: string;
-  alias?: string;
-  team?: string;
-  email?: string;
-  gender?: boolean;
-  dob?: Date;
-  country?: string;
+  subName?: string;
+  password?: string;
+  passwordConfirm?: string;
   photo?: string;
 }
-
 export interface IUserGet {
   page?: string;
   size?: string;
-  email?: string;
-  alias?: string;
+  team?: string;
+  role?: string;
   search?: string;
   sortBy?: string;
   orderBy?: string;

@@ -21,32 +21,24 @@ export default class UserService extends BaseRepository<IUser> {
   }
   async getFilterUser(filter: any): Promise<any> {
     try {
-      let { page, size, alias, search, sortBy, orderBy } = filter;
+      let { page, size, team, role, search, sortBy, orderBy } = filter;
       let _page = page ? parseInt(page) : 1;
       let _size = size ? parseInt(size) : 10;
       let users, totalRows, finalFilter;
       const _sortBy: string = sortBy ? sortBy : "created_at";
       const _orderBy: number = orderBy ? parseInt(orderBy) : 1;
       const sorting: any = { [_sortBy]: _orderBy };
-      if (!alias) {
-        if (search) {
-          finalFilter = {
-            isDelete: false,
-            $text: { $search: '"' + search + '"' },
-          };
-        } else {
-          finalFilter = { isDelete: false };
-        }
+      if (search) {
+        finalFilter = {
+          isDelete: false,
+          $text: { $search: `\"` + search + `\"` },
+        };
       } else {
-        if (search) {
-          finalFilter = {
-            isDelete: false,
-            $text: { $search: '"' + search + '"' },
-          };
-        } else {
-          finalFilter = { isDelete: false, alias: alias };
-        }
+        finalFilter = {
+          isDelete: false,
+        };
       }
+      console.log(finalFilter);
       users = await User.find(finalFilter)
         .select({ isDelete: 0 })
         .limit(_size)
@@ -104,6 +96,15 @@ export default class UserService extends BaseRepository<IUser> {
       if (!user) {
         throw new AppError(ErrorResponsesCode.NOT_FOUND, "User not Exist");
       }
+      return user;
+    } catch (err) {
+      throw err;
+    }
+  }
+
+  async editProfile(userId: string, data: object) {
+    try {
+      const user = await this.update({ _id: userId }, data);
       return user;
     } catch (err) {
       throw err;

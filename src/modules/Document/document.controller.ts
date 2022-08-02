@@ -1,14 +1,17 @@
 import { Request, Response } from "express";
 import DocumentService from "./document.services";
-import { serializerDocument, serializerGetDocument } from "./document.serializer";
-import { successReponse } from "../../common/services/response.sevice";
+import {
+  serializerDocument,
+  serializerGetDocument,
+} from "./document.serializer";
+import { successReponse } from "../../common/services/response.service";
 import Document from "../../common/models/document.model";
 import { IDocumentGet, IDocumentUpdate } from "./document.interface";
 import catchAsync from "../../utils/catchAsync";
 import { any } from "joi";
 
 export default class DocumentController {
-  public documentService: DocumentService = new DocumentService(Document)
+  public documentService: DocumentService = new DocumentService(Document);
 
   public createDocument = catchAsync(async (req: Request, res: Response) => {
     const result = await this.documentService.createDocument(req.body);
@@ -28,7 +31,6 @@ export default class DocumentController {
     };
     return successReponse(req, res, resultData, "Get Successfully");
   });
-
 
   public getDocument = catchAsync(async (req: Request, res: Response) => {
     const filter: object = {

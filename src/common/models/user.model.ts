@@ -64,7 +64,13 @@ const UserSchema: Schema = new Schema<IUser>(
   { timestamps: { createdAt: "created_at", updatedAt: "updated_at" } }
 );
 
-UserSchema.index({ fullName: 1, alias: 1 });
+UserSchema.index({
+  fullName: "text",
+  alias: "text",
+  email: "text",
+  role: 1,
+  team: 1,
+});
 
 UserSchema.pre<IUser>("save", async function (next: any): Promise<void> {
   if (!this.isModified("password")) return next();

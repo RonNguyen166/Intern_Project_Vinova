@@ -1,15 +1,18 @@
 import { Request, Response } from "express";
 import UserService from "./user.services";
 import { serializerUser, serializerGetUser } from "./user.serializer";
-import { successReponse } from "../../common/services/response.sevice";
+import { successReponse } from "../../common/services/response.service";
 import User from "../../common/models/user.model";
-import { IUserGet, IUserUpdate } from "./user.interface";
+import { IUserGet, IUserUpdate, IUserProfile } from "./user.interface";
 import catchAsync from "../../utils/catchAsync";
+import { s3DeleteUpload, s3Upload } from "../../common/services/upload.service";
 
 export default class UserController {
   public userService: UserService = new UserService(User);
 
   public createUser = catchAsync(async (req: Request, res: Response) => {
+    const url = await s3Upload(req.file);
+    req.body.photo = url;
     const result = await this.userService.createUser(req.body);
     const resultData: object = {
       user: serializerGetUser(result),
@@ -54,6 +57,10 @@ export default class UserController {
   });
 
   public updateUser = catchAsync(async (req: Request, res: Response) => {
+    if (req.file) {
+      const url = await s3Upload(req.file);
+      req.body.photo = url;
+    }
     const dataBody: IUserUpdate = { ...req.body };
 
     const result = await this.userService.updateUser(req.params.id, dataBody);
@@ -63,8 +70,23 @@ export default class UserController {
     return successReponse(req, res, resultData, "Updated Succesfully");
   });
 
+  public editProfile = catchAsync(async (req: Request, res: Response) => {
+    const url = await s3Upload(req.file);
+    if (req.file) req.body.photo = url;
+    const dataBody: IUserProfile = { ...req.body };
+    const result = await this.userService.editProfile(
+      (<any>req).authenticatedUser._id,
+      dataBody
+    );
+    const resultData: object = {
+      user: serializerGetUser(result),
+    };
+    return successReponse(req, res, resultData, "Updated Succesfully");
+  });
+
   public deleteUser = catchAsync(async (req: Request, res: Response) => {
-    await this.userService.deleteUser(req.params.id);
-    return successReponse(req, res, { isDelete: true }, "Updated Succesfully");
+    const user = await this.userService.deleteUser(req.params.id);
+    await s3DeleteUpload(user.photo);
+    return successReponse(req, res, { isDelete: true }, "Deleted Succesfully");
   });
 }

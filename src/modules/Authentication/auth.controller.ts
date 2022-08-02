@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import moment from "moment";
 
-import { successReponse } from "../../common/services/response.sevice";
+import { successReponse } from "../../common/services/response.service";
 import catchAsync from "../../utils/catchAsync";
 import { serializerGetUser } from "../User/user.serializer";
 import {

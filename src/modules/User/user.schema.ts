@@ -21,7 +21,6 @@ const create = Joi.object({
     gender: Joi.boolean().required(),
     dob: Joi.date().required(),
     country: Joi.string().required(),
-    photo: Joi.any(),
     email: Joi.string().required().email(),
     point: Joi.object().keys({
       givePoint: Joi.number().required(),
@@ -84,4 +83,34 @@ const deleteOne: ObjectSchema = Joi.object({
     id: Joi.string(),
   }),
 });
-export { create, deleteOne, updateOne, getAll, getOne };
+
+// const editProfile: ObjectSchema = Joi.object({
+//   body: Joi.object().keys({
+//     fullName: Joi.string(),
+//     subName: Joi.string(),
+//     alias: Joi.string(),
+//     gender: Joi.boolean(),
+//     dob: Joi.date(),
+//     country: Joi.string(),
+//     photo: Joi.any(),
+//     email: Joi.string().email(),
+//     password: Joi.string().min(6).max(40).custom(password),
+//     passwordConfirm: Joi.any()
+//       .equal(Joi.ref("password"))
+//       .label("Confirm password")
+//       .messages({ "any.only": "{{#label}} does not match" })
+//   }),
+// });
+const editProfile: ObjectSchema = Joi.object({
+  body: Joi.object().keys({
+    fullName: Joi.string(),
+    subName: Joi.string(),
+    password: Joi.string().min(6).max(40).custom(password),
+    passwordConfirm: Joi.any()
+      .equal(Joi.ref("password"))
+      .label("Confirm password")
+      .messages({ "any.only": "{{#label}} does not match" }),
+    photo: Joi.any(),
+  }),
+});
+export { create, deleteOne, updateOne, getAll, getOne, editProfile };
