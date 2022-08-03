@@ -2,6 +2,7 @@ import express from "express";
 import mongoose from "mongoose";
 //import TagController from "../Tags/tag.controller";
 import { ITag, Tag } from "./../../common/models/tag.model";
+import Category from "./../../common/models/category.model";
 import PostService from "./post.services";
 
 export default class PostController {
@@ -16,17 +17,20 @@ export default class PostController {
       postObj = { ...req.body };
 
       /*user_id*/
+
       if (!req.authenticatedUser) {
         throw "Please login to create post";
       }
       postObj.user_id = req.authenticatedUser._conditions._id;
+      postObj.user_id = null;
 
-      if(req.body.category == "vibonus"){
-        
-      }
 
       /*tags*/
-      let tags: any = { ...req.body.tags };
+      let tags: any = [];
+      for(let i = 0; i < req.body.tags.length; i++){
+        tags.push(req.body.tags[i]);
+      }
+      console.log(tags);
       let tagIds: any = [];
       await Promise.all(
         tags.map(async (tagString: any) => {
@@ -55,7 +59,44 @@ export default class PostController {
       );
 
       postObj.tag = tagIds;
+
+      /*views*/
       postObj.views = 0;
+
+      /*Category*/
+      let categorys = [];
+      for(let i = 0; i < req.body.category.length; i++){
+        categorys.push(req.body.category[i]);
+      }
+      console.log(categorys);
+      let categoryId: any =[];
+      await Promise.all(
+        categorys.map(async (categoryString:  any)=>{
+          let category = await Category.findOne({name : categoryString});
+          if(!category){
+            try {
+              category = await Category.create({
+                name: categoryString,
+              });
+              console.log(categoryId);
+              categoryId.push(category._id);
+            } catch (err) {
+              throw err;
+            }
+          } else {
+            try {
+              categoryId.push(category._id);
+              await category.save();
+            } catch (err) {
+              throw err;
+            }
+          }
+        })
+      );
+
+      postObj.category = categoryId;
+
+
 
       const post = await this.postService.createPost(req.body);
       res.status(201).json({
@@ -64,7 +105,10 @@ export default class PostController {
           post,
         },
       });
+
+
     } catch (err) {
+      console.log(err);
       res.status(400).json({
         status: "error",
         message: err,
