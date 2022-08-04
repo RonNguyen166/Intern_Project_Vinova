@@ -1,5 +1,5 @@
 import express from "express";
-import {auth} from "../../middlewares/authen.middleware";
+import {isAuthen, isAuthor} from "../../middlewares/authen.middleware";
 import ProductController from "./product.controller";
 import RedemptionController from "../Redemptions/redemption.controller";
 
@@ -13,7 +13,7 @@ POST method for testing purposes only
 router
   .route("/")
   .get(productController.getAllProduct)
-  .post(auth("User"), productController.createProduct);
+  .post(isAuthen, productController.createProduct);
 
 /*
 UPDATE method for testing purposes only
@@ -27,7 +27,7 @@ router
 
 router
   .route("/:id/redeem")
-  .post(auth("User"), redemptionController.createRedemption);
+  .post(isAuthen, redemptionController.createRedemption);
 
 router.route('/redemptions/top_redeem').get(redemptionController.getTopRedeem);
 export default router;

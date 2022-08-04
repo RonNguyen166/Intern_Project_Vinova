@@ -2,13 +2,9 @@ import mongoose from "mongoose";
 import express from "express";
 import TransactionService from "./transaction.services";
 import TransactionDetailService from "../TransactionDetails/transactiondetail.services";
-import {
-  TransactionDetail,
-  ITransactionDetail,
-} from "../../common/models/transactiondetail.model";
+
 import { Tag, ITag } from "../../common/models/tag.model";
 import Users from "../../common/models/user.model";
-import UserService from "../User/user.services";
 export default class TransactionController {
   private transactionService: TransactionService = new TransactionService();
   private transactionDetailService: TransactionDetailService =
@@ -68,11 +64,33 @@ export default class TransactionController {
       const transactions = await this.transactionService.getTransactionByUserId(
         req.authenticatedUser._id
       );
+        console.log(transactions);
+      var totalPointsReceived = 0;
+      var totalPointsGiven = 0;
+      var totalRedemptions = 0;
+      for(let i = 0; i < transactions.length; i++){
+        if(transactions[i].type === "Receive Pt"){
+          totalPointsReceived += transactions[i].point;
+        }
+        else if(transactions[i].type === "Give Pt"){
+          //console.log("----------");
+          //console.log(transactions[i].point);
+          totalPointsGiven = totalPointsGiven + transactions[i].point;
+          //console.log(totalPointsGiven);
+        }
+        else if(transactions[i].type === "Redemption"){
+          totalRedemptions += 1;
+        }
+      }
+      totalPointsGiven *= -1; 
       res.status(200).json({
         status: "success",
         length: transactions.length,
         data: {
-          transactions,
+          points_received: totalPointsReceived,
+          points_given: totalPointsGiven,
+          redemptions: totalRedemptions,
+          transactions: transactions,
         },
       });
     } catch (err) {
@@ -185,7 +203,7 @@ export default class TransactionController {
         toUsersIdArray.push(receivedUser);
       }
       /* calculate point for each user in transaction and update them */
-      console.log("TOUSERARRAY" + toUsersIdArray[0]);
+      //console.log("TOUSERARRAY" + toUsersIdArray[0]);
       for(let i = 0; i < toUsersIdArray.length; i++){
         toUsersIdArray[i].point.givePoint += parseInt(postToken[0]);
         await Users.findOneAndUpdate({_id: toUsersIdArray[i]._id}, toUsersIdArray[i]);
@@ -210,24 +228,19 @@ export default class TransactionController {
       transDetailsObj.transaction_id = transaction._id;
       transDetailsObj.createdAt = transaction.createdAt;
       transDetailsObj.updatedAt = transaction.updatedAt;
-
+      
       for (let i = 0; i < toUsersArray.length; i++) {
-        //console.log(toUsersArray[i], toUsersArray.length);
         transDetailsObj.user_id_to = await Users.findOne({
           name: toUsersArray[i],
         });
-
         transDetailsObj.user_id_to = transDetailsObj.user_id_to._id;
-
         transactionReceived.user_id = transDetailsObj.user_id_to;
-        //console.log(transactionReceived);
         await this.transactionService.createTransaction(transactionReceived);
-
-        //console.log(transDetailsObj.user_id_to);
         toUsersArray[i] = transDetailsObj.user_id_to;
-        await this.transactionDetailService.createTransDetail(transDetailsObj);
-        //console.log(transDetailsObj);
       }
+      transDetailsObj.user_id_to = toUsersArray;
+  
+      await this.transactionDetailService.createTransDetail(transDetailsObj);
       /* Update score for Give User */
       await Users.findOneAndUpdate({_id: fromUser._id}, fromUser);
       return res.status(201).json({

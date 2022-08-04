@@ -2,6 +2,7 @@ import RedemptionService from "./redemption.services";
 import TransactionService from "../Transactions/transaction.services";
 import express from "express";
 import { IProduct, Product } from "./../../common/models/product.model";
+import Users from "./../../common/models/user.model";
 import mongoose from "mongoose";
 
 export default class RedeemptionController {
@@ -37,11 +38,15 @@ export default class RedeemptionController {
       ) {
         throw "Please login to get access";
       }
-
+      let user = await Users.findById(req.authenticatedUser._id);
+      if(user == null){
+        throw "Invalid user";
+      }
+  
       product.quantity -= redemptionObj.quantity;
       console.log(product);
       await product.save();
-      redemptionObj.user_id = req.authenticatedUser._conditions._id;
+      redemptionObj.user_id = req.authenticatedUser._id;
       //console.log(redemptionObj);
       const redemption = await this.redemptionService.createRedemption(
         redemptionObj
@@ -51,10 +56,13 @@ export default class RedeemptionController {
       const transactionService = new TransactionService();
       let transactionSubject = `${product.title} x${redemptionObj.quantity}`;
       let transactionPoint = -product.price * redemptionObj.quantity;
+      
+      user.point.redeemPoint -= product.price * redemptionObj.quantity;
+      await Users.findOneAndUpdate({_id: user._id}, user);
 
       await transactionService.createTransaction({
-        user_id: req.authenticatedUser._conditions._id,
-        type: "Redeemption",
+        user_id: req.authenticatedUser._id,
+        type: "Redemption",
         subject: transactionSubject,
         point: transactionPoint,
       });
@@ -65,6 +73,7 @@ export default class RedeemptionController {
         redemption,
       });
     } catch (err) {
+      console.log(err);
       return res.status(400).json({
         status: "error",
         message: err,
