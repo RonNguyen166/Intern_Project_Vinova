@@ -2,7 +2,7 @@
 import mongoose, { Model } from "mongoose";
 import Comment, { IComment } from "../../common/models/comment.model";
 import { BaseRepository } from "../../common/repository/base.repository";
-import AppError from "../../utils/AppError";
+import AppError from "../../utils/appError";
 import { ErrorResponsesCode } from "../../utils/constants";
 import ApiFeatures from "../../utils/apiFeatures";
 export default class CommentService extends BaseRepository<IComment> {
