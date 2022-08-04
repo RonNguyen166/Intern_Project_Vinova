@@ -13,4 +13,6 @@ router
   .route("/")
   .get(isAuthen, redemptionController.getRedemptionsByUserId);
 
+//router.get("/all", redemption)
+
 export default router;
