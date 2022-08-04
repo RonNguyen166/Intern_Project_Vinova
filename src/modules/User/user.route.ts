@@ -19,14 +19,19 @@ export default class UserRoute {
   }
   public intializeRoute(): void {
     this.router.patch(
-      "/edit-profile",
+      "edit-profile",
       upload.single("photo"),
       isAuthen,
       validate(editProfile),
       this.userController.editProfile
     );
 
-    this.router.get("/filter", this.userController.getFilterUsers);
+    this.router.get("/profile", isAuthen, this.userController.getProfile);
+    this.router.get(
+      "/filter",
+      validate(getAll),
+      this.userController.getFilterUsers
+    );
     this.router
       .route("/:id")
       .get(validate(getOne), this.userController.getUser)
@@ -46,7 +51,7 @@ export default class UserRoute {
 
     this.router
       .route("/")
-      .get(validate(getAll), this.userController.getAllUsers)
+      .get(this.userController.getAllUsers)
       .post(
         isAuthen,
         isAuthor,

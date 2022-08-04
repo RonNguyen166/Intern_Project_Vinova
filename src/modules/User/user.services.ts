@@ -11,9 +11,9 @@ export default class UserService extends BaseRepository<IUser> {
   async getAllUsers(): Promise<any> {
     try {
       const users = await this.getAll();
-      if (!users) {
-        throw new AppError(ErrorResponsesCode.NOT_FOUND, "User not Exist");
-      }
+      // if (!users) {
+      //   throw new AppError(ErrorResponsesCode.NOT_FOUND, "Users Not Found");
+      // }
       return users;
     } catch (err) {
       throw err;
@@ -54,7 +54,7 @@ export default class UserService extends BaseRepository<IUser> {
         .sort(sorting)
         .exec();
       totalRows = await User.countDocuments(finalFilter).exec();
-      if (!users) {
+      if (!users.length) {
         throw new AppError(ErrorResponsesCode.NOT_FOUND, "User not Exist");
       }
       return {

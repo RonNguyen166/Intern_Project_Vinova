@@ -16,11 +16,11 @@ import { upload } from "../../common/services/upload.service";
 export default class AdminRoute {
   public router: Router = Router();
   public userController = new UserController();
-  public productController = new ProductController();
-  public postController = new PostController();
-  public categoryController = new CategoryController();
-  public documentController = new DocumentController();
-  public redeemptionController = new RedeemptionController();
+  // public productController = new ProductController();
+  // public postController = new PostController();
+  // public categoryController = new CategoryController();
+  // public documentController = new DocumentController();
+  // public redeemptionController = new RedeemptionController();
 
   constructor() {
     this.initializeRoute();
@@ -46,82 +46,82 @@ export default class AdminRoute {
         this.userController.createUser
       );
 
-    this.router
-      .route("/products")
-      .get(this.productController.getAllProduct)
-      .post(
-        validate(new productValidation().createSchema),
-        this.productController.createProduct
-      );
+    // this.router
+    //   .route("/products")
+    //   .get(this.productController.getAllProduct)
+    //   .post(
+    //     validate(new productValidation().createSchema),
+    //     this.productController.createProduct
+    //   );
 
-    this.router
-      .route("/products/:id")
-      .get(this.productController.getProduct)
-      .patch(
-        validate(new productValidation().createSchema),
-        this.productController.updateProduct
-      )
-      .delete(this.productController.deleteProduct);
+    // this.router
+    //   .route("/products/:id")
+    //   .get(this.productController.getProduct)
+    //   .patch(
+    //     validate(new productValidation().createSchema),
+    //     this.productController.updateProduct
+    //   )
+    //   .delete(this.productController.deleteProduct);
 
-    this.router
-      .route("/posts")
-      .get(this.postController.getAllPost)
-      .post(this.postController.createPost);
+    // this.router
+    //   .route("/posts")
+    //   .get(this.postController.getAllPost)
+    //   .post(this.postController.createPost);
 
-    this.router
-      .route("/categories")
-      .get(
-        validate(categoryValidation.getAll),
-        this.categoryController.getAllCategorys
-      )
-      .post(
-        validate(categoryValidation.create),
-        this.categoryController.createCategory
-      );
+    // this.router
+    //   .route("/categories")
+    //   .get(
+    //     validate(categoryValidation.getAll),
+    //     this.categoryController.getAllCategorys
+    //   )
+    //   .post(
+    //     validate(categoryValidation.create),
+    //     this.categoryController.createCategory
+    //   );
 
-    this.router
-      .route("/categories/:id")
-      .get(
-        validate(categoryValidation.getOne),
-        this.categoryController.getCategory
-      )
-      .patch(
-        validate(categoryValidation.updateOne),
-        this.categoryController.updateCategory
-      )
-      .delete(
-        validate(categoryValidation.deleteOne),
-        this.categoryController.deleteCategory
-      );
+    // this.router
+    //   .route("/categories/:id")
+    //   .get(
+    //     validate(categoryValidation.getOne),
+    //     this.categoryController.getCategory
+    //   )
+    //   .patch(
+    //     validate(categoryValidation.updateOne),
+    //     this.categoryController.updateCategory
+    //   )
+    //   .delete(
+    //     validate(categoryValidation.deleteOne),
+    //     this.categoryController.deleteCategory
+    //   );
 
-    this.router
-      .route("/documents")
-      .get(
-        validate(documentValidation.getAll),
-        this.documentController.getAllDocuments
-      )
-      .post(
-        validate(documentValidation.create),
-        this.documentController.createDocument
-      );
+    // this.router
+    //   .route("/documents")
+    //   .get(
+    //     validate(documentValidation.getAll),
+    //     this.documentController.getAllDocuments
+    //   )
+    //   .post(
+    //     validate(documentValidation.create),
+    //     this.documentController.createDocument
+    //   );
 
-    this.router
-      .route("/documents/:id")
-      .get(
-        validate(documentValidation.getOne),
-        this.documentController.getDocument
-      )
-      .patch(
-        validate(documentValidation.updateOne),
-        this.documentController.updateDocument
-      )
-      .delete(
-        validate(documentValidation.deleteOne),
-        this.documentController.deleteDocument
-      );
+    // this.router
+    //   .route("/documents/:id")
+    //   .get(
+    //     validate(documentValidation.getOne),
+    //     this.documentController.getDocument
+    //   )
+    //   .patch(
+    //     validate(documentValidation.updateOne),
+    //     this.documentController.updateDocument
+    //   )
+    //   .delete(
+    //     validate(documentValidation.deleteOne),
+    //     this.documentController.deleteDocument
+    //   );
 
-    this.router
-      .route("/redeemptions")
-      .get(this.redeemptionController.getAllRedemptions);
+    // this.router
+    //   .route("/redeemptions")
+    //   .get(this.redeemptionController.getAllRedemptions);
   }
 }

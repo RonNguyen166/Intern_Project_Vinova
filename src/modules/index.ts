@@ -15,28 +15,28 @@ import AdminRoute from "./Admin/admin.route";
 export default class CombineRoute {
   private userRoute = new UserRouter();
   private authRoute = new AuthRoute();
-  private documentRoute = new DocumentRoute();
-  private branchRoute = new BranchRoute();
+  // private documentRoute = new DocumentRoute();
+  // private branchRoute = new BranchRoute();
   private categoryRoute = new CategoryRoute();
   private adminRoute = new AdminRoute();
 
-  private productRoute = ProductRouter;
-  private redemptionRoute = RedemptionRouter;
+  // private productRoute = ProductRouter;
+  // private redemptionRoute = RedemptionRouter;
   private tagRoute = TagRouter;
-  private transactionRoute = TransactionRouter;
-  private postRoute = PostRouter;
+  // private transactionRoute = TransactionRouter;
+  private postRoute = new PostRouter();
 
   public start(app: Application) {
-    app.use("/v1/products", this.productRoute);
-    app.use("/v1/redemptions", this.redemptionRoute);
+    // app.use("/v1/products", this.productRoute);
+    // app.use("/v1/redemptions", this.redemptionRoute);
     app.use("/v1/tags", this.tagRoute);
-    app.use("/v1/transactions", this.transactionRoute);
-    app.use("/v1/posts", this.postRoute);
+    // app.use("/v1/transactions", this.transactionRoute);
+    app.use("/v1/posts", this.postRoute.router);
     app.use("/v1/users", this.userRoute.router);
     app.use("/v1/auth", this.authRoute.router);
-    app.use("/v1", this.documentRoute.router);
-    app.use("/v1", this.branchRoute.router);
+    // app.use("/v1", this.documentRoute.router);
+    // app.use("/v1", this.branchRoute.router);
     app.use("/v1", this.categoryRoute.router);
-    app.use("/v1/adim", this.adminRoute.router);
+    app.use("/v1/admin", this.adminRoute.router);
   }
 }

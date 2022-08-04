@@ -1,14 +1,15 @@
-import mongoose from "mongoose";
+import { model, Schema } from "mongoose";
+import { IBase, SchemaBase } from "./base.model";
 
-export interface ITag {
+export interface ITag extends IBase {
   name: string;
   amount: number;
-  createdAt: Date;
-  updatedAt: Date;
+  increaseAmount: Function;
+  decreaseAmount: Function;
 }
 
-const schema = new mongoose.Schema<ITag>(
-  {
+const tagSchema: Schema = new Schema<ITag>(
+  SchemaBase({
     name: {
       type: String,
       required: true,
@@ -16,12 +17,20 @@ const schema = new mongoose.Schema<ITag>(
     },
     amount: {
       type: Number,
-      required: true,
+      default: 1,
     },
-  },
-  {
-    timestamps: true,
-  }
+  }),
+  { timestamps: { createdAt: "created_at", updatedAt: "updated_at" } }
 );
 
-export const Tag: mongoose.Model<ITag> = mongoose.model<ITag>("Tag", schema);
+tagSchema.index({ name: "text" });
+
+tagSchema.methods.increaseAmount = async function (): Promise<any> {
+  return ++this.amount && this.save();
+};
+
+tagSchema.methods.decreaseAmount = async function (): Promise<any> {
+  return this.amount && this.amount-- && this.save();
+};
+
+export default model<ITag>("Tags", tagSchema);

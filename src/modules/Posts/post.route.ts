@@ -1,22 +1,30 @@
-import express from "express";
-import CommentController from "../Comments/comment.controller";
+import { Router } from "express";
+import { isAuthen } from "./../../middlewares/authen.middleware";
 import PostController from "./post.controller";
-import {auth} from "./../../middlewares/authen.middleware";
+import validate from "../../middlewares/validate.middleware";
+import { create, getOne, updateOne, deleteOne, getFilter } from "./post.schema";
 
-const commentController = new CommentController();
-const postController = new PostController();
+export default class PostRoute {
+  public router: Router = Router();
+  private postController = new PostController();
 
-const router = express.Router();
+  constructor() {
+    this.initializeRoute();
+  }
+  public initializeRoute() {
+    this.router
+      .route("/")
+      .get(this.postController.getAllPosts)
+      .post(isAuthen, validate(create), this.postController.createPost);
 
-router
-  .route("/")
-  .get(postController.getAllPost)
-  .post(auth("member", "admin"), postController.createPost);
-router.route("/:postId/comments").get(commentController.getCommentsByPostId);
-
-router
-  .route("/:postId")
-  .post(postController.createPost)
-  .patch(postController.updatePost)
-  .delete(postController.deletePost);
-export default router;
+    this.router
+      .route("/filter")
+      .get(validate(getFilter), this.postController.getFilterPosts);
+    this.router.get("/my-posts", isAuthen, this.postController.getMyPosts);
+    this.router
+      .route("/:id")
+      .get(this.postController.getPost)
+      .patch(isAuthen, validate(updateOne), this.postController.updatePost)
+      .delete(isAuthen, validate(deleteOne), this.postController.deletePost);
+  }
+}

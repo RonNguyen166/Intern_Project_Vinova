@@ -30,6 +30,6 @@ const schema = new mongoose.Schema<IComment>({
 });
 
 export const Comment: mongoose.Model<IComment> = mongoose.model<IComment>(
-  "Comment",
+  "Comments",
   schema
 );

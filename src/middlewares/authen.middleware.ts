@@ -2,7 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import catchAsync from "../utils/catchAsync";
 import Token from "../utils/token";
 import UserService from "../modules/User/user.services";
-import User, { IUser } from "../common/models/user.model";
+import User from "../common/models/user.model";
 import { serializerGetUser } from "../modules/User/user.serializer";
 import { ErrorResponsesCode } from "../utils/constants";
 import AppError from "../utils/appError";

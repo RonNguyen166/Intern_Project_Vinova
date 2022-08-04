@@ -1,32 +1,33 @@
-import { number } from "joi";
-import mongoose from "mongoose";
+import { Schema, model } from "mongoose";
+import { IBase, SchemaBase } from "./base.model";
 
-export interface IPost {
-  user_id: mongoose.Schema.Types.ObjectId;
-  images: string[];
+export interface IPost extends IBase {
+  user_id: Schema.Types.ObjectId;
   title: string;
-  body: string;
-  category: mongoose.Schema.Types.ObjectId;
-  tag: mongoose.Schema.Types.ObjectId[];
+  tags: Schema.Types.ObjectId[];
+  content: string;
+  category: Schema.Types.ObjectId;
   views: number;
-  createdAt: Date;
-  updatedAt: Date;
+  comments: string;
 }
 
-const schema = new mongoose.Schema<IPost>(
-  {
-    user_id: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
-    images: [String],
-    title: String,
-    body: { type: String, required: [true, "A post must have content"] },
-    category: { type: mongoose.Schema.Types.ObjectId, ref: "Category" },
-    tag: [{ type: mongoose.Schema.Types.ObjectId }],
-    views: Number,
-  },
-  { timestamps: true }
+const postSchema: Schema = new Schema<IPost>(
+  SchemaBase({
+    user_id: { type: Schema.Types.ObjectId, ref: "Users" },
+    title: { type: String, required: true },
+    tags: [{ type: Schema.Types.ObjectId, ref: "Tags" }],
+    content: { type: String, required: true },
+    category: { type: Schema.Types.ObjectId, ref: "Categories" },
+    views: { type: Number, default: 0 },
+    comments: [{ type: Schema.Types.ObjectId, ref: "Comments" }],
+  }),
+  { timestamps: { createdAt: "created_at", updatedAt: "updated_at" } }
 );
 
-export const Post: mongoose.Model<IPost> = mongoose.model<IPost>(
-  "Post",
-  schema
-);
+postSchema.index({ title: "text", tags: "text", content: "text", category: 1 });
+
+postSchema.methods.increaseAmount = async function (): Promise<Error | number> {
+  return this.views++;
+};
+
+export default model<IPost>("Posts", postSchema);
