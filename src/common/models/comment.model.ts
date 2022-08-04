@@ -1,35 +1,31 @@
-import mongoose from "mongoose";
+import mongoose, {Schema, model} from "mongoose";
+import { IBase, SchemaBase } from "./base.model";
 
-export interface IComment {
+export interface IComment extends IBase {
   content: string;
   user_id: mongoose.Schema.Types.ObjectId;
-  parent_id: mongoose.Schema.Types.ObjectId;
-  type: string;
-  onModel: string;
+  parent_id: mongoose.Schema.Types.ObjectId[];
 }
 
-const schema = new mongoose.Schema<IComment>({
-  content: {
-    type: "String",
-    required: [true, "A comment cannot be empty"],
-  },
-  user_id: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "User",
-  },
-  parent_id: {
-    type: mongoose.Schema.Types.ObjectId,
-    required: true,
-    refPath: "onMOdel",
-  },
-  onModel: {
-    type: String,
-    required: true,
-    enum: ["Comment, Post"],
-  },
-});
-
-export const Comment: mongoose.Model<IComment> = mongoose.model<IComment>(
-  "Comment",
-  schema
+const CommentSchema = new Schema<IComment>(
+  SchemaBase({
+    content: {
+      type: "String",
+      required: [true, "A comment cannot be empty"],
+    },
+    user_id: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+    },
+    parent_id:[ {
+      type: mongoose.Schema.Types.ObjectId,
+      required: true,
+      refPath: "Comments",
+    }],
+  }),
+  {
+    timestamps: { createdAt: "created_at", updatedAt: "updated_at" },
+  }
 );
+
+export default model<IComment>("Comments", CommentSchema);

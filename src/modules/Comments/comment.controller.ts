@@ -1,66 +1,68 @@
-import express from "express";
+import { Request, Response } from "express";
 import CommentService from "./comment.services";
+import {
+  serializerComment,
+  serializerGetComment,
+} from "./comment.serializer";
+import { successReponse } from "../../common/services/response.service";
+import Comment from "../../common/models/comment.model";
+import { ICommentGet, ICommentUpdate } from "./comment.interface";
+import catchAsync from "../../utils/catchAsync";
+import { any } from "joi";
 
 export default class CommentController {
-  private commentService: CommentService = new CommentService();
-  public getAllComments = async <CommentController>(
-    req: express.Request,
-    res: express.Response,
-    next: express.NextFunction
-  ) => {
-    try {
-      const comments = await this.commentService.getAllComments(req.query);
-      res.status(200).json({
-        status: "success",
-        length: comments.length,
-        data: {
-          comments,
-        },
-      });
-    } catch (err) {
-      res.status(400).json({
-        status: "error",
-        message: err,
-      });
-    }
-  };
+  public commentService: CommentService = new CommentService(Comment);
 
-  public createComment = async <CommentController>(
-    req: express.Request,
-    res: express.Response,
-    next: express.NextFunction
-  ) => {
-    try {
-      const comment = await this.commentService.createComment(req.body);
-      res.status(201).json({
-        status: "success",
-        data: {
-          comment,
-        },
-      });
-    } catch (err) {
-      res.status(400).json({
-        status: "error",
-        message: err,
-      });
-    }
-  };
+  public createComment = catchAsync(async (req: Request, res: Response) => {
+    const result = await this.commentService.createComment(req.body);
+    const resultData: object = {
+      comment: serializerGetComment(result),
+    };
+    return successReponse(req, res, resultData, "Create Successfully", 201);
+  });
 
-  public getCommentsByPostId = async <CommentController>(
-    req: express.Request,
-    res: express.Response,
-    next: express.NextFunction
-  ) => {
-    try {
-      const comments = await this.commentService.getCommentsByPostId(
-        req.params.postId,
-        req.query
-      );
-    } catch (err) {
-      res.status(400).json({
-        status: "error",
-        message: err,
-      });
-    }
-  };
+  public getAllComments = catchAsync(async (req: Request, res: Response) => {
+    const results = await this.commentService.getAllComments(req.query)
+    const serializedResults = results.map((ele: any) =>
+      ele.id ? serializerGetComment(ele) : serializerComment(ele)
+    );
+    const resultData: object = {
+      comments: serializedResults,
+    };
+    return successReponse(req, res, resultData, "Get Successfully");
+  });
+
+  public getComment = catchAsync(async (req: Request, res: Response) => {
+    const filter: object = {
+      _id: req.params.id,
+      isDelete: false,
+    };
+    const result = await this.commentService.getComment(filter);
+    const resultData: object = {
+      comment: serializerGetComment(result),
+    };
+    return successReponse(req, res, resultData, "Get Succesfully");
+  });
+
+  public updateComment = catchAsync(async (req: Request, res: Response) => {
+    const filter: object = {
+      _id: req.params.id,
+      isDelete: false,
+    };
+    const dataBody: ICommentUpdate = { ...req.body };
+    const result = await this.commentService.updateComment(filter, dataBody);
+    const resultData: object = {
+      comment: serializerGetComment(result),
+    };
+    return successReponse(req, res, resultData, "Updated Succesfully");
+  });
+
+  public deleteComment = catchAsync(async (req: Request, res: Response) => {
+    const filter: object = {
+      _id: req.params.id,
+      isDelete: false,
+    };
+    await this.commentService.deleteComment(filter);
+    return successReponse(req, res, { isDelete: true }, "Updated Succesfully");
+  });
 }

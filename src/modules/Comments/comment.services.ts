@@ -1,68 +1,81 @@
-import mongoose from "mongoose";
-import ApiFeatures from "../../utils/apiFeatures";
-import { Comment, IComment } from "./../../common/models/comment.model";
-import { StringMappingType } from "typescript";
 
-export default class CommentService {
-  public async getAllComments(queryString: object) {
+import mongoose, { Model } from "mongoose";
+import Comment, { IComment } from "../../common/models/comment.model";
+import { BaseRepository } from "../../common/repository/base.repository";
+import AppError from "../../utils/AppError";
+import { ErrorResponsesCode } from "../../utils/constants";
+import ApiFeatures from "../../utils/apiFeatures";
+export default class CommentService extends BaseRepository<IComment> {
+  constructor(public readonly commentRepository: Model<IComment>) {
+    super(commentRepository);
+  }
+  async getAllComments(queryString: object): Promise<any> {
     try {
       const apiFeatures = new ApiFeatures(Comment.find(), queryString)
         .filter()
         .sort()
         .paginate();
       const comments = apiFeatures.query;
+      if (!comments) {
+        throw new AppError(ErrorResponsesCode.NOT_FOUND, "Comments not Exist");
+      }
       return comments;
     } catch (err) {
       throw err;
     }
   }
 
-  public async getComment(id: string) {
+  async getComment (commentId: any): Promise<any> {
     try {
-      const comment = await Comment.findOne({ _id: id });
+      const comment = await this.getOne({ _id: commentId });
+      if (!comment) {
+        throw new AppError(ErrorResponsesCode.NOT_FOUND, "Comment not Exist");
+      }
       return comment;
     } catch (err) {
       throw err;
     }
   }
 
-  public async createComment(body: object) {
+  async createComment(data: any): Promise<any> {
     try {
-      const comment = await Comment.create(body);
+      const comment = await this.create(data);
       return comment;
     } catch (err) {
       throw err;
     }
   }
 
-  public async updateComment(id: string, body: object) {
+  async updateComment (commentId: any, data: object) {
     try {
-      const comment = await Comment.findOneAndUpdate({ _id: id }, body);
+      const comment = await this.update({ _id: commentId }, data);
+      if (!comment) {
+        throw new AppError(ErrorResponsesCode.NOT_FOUND, "Comment not Exist");
+      }
       return comment;
     } catch (err) {
       throw err;
     }
   }
-
-  public async deleteComment(id: string) {
+  async deleteComment (commentId: any) {
     try {
-      await Comment.findOneAndDelete({ _id: id });
+      const comment = await this.delete({ _id: commentId });
+      if (!comment) {
+        throw new AppError(ErrorResponsesCode.NOT_FOUND, "Comment not Exist");
+      }
+      return comment;
     } catch (err) {
       throw err;
     }
   }
-
-  public async getCommentsByPostId(postId: string, queryString: object) {
-    try {
-      const apiFeatures = await new ApiFeatures(
-        Comment.find({ postId: postId }),
-        queryString
-      )
-        .filter()
-        .sort()
-        .paginate();
-      return apiFeatures;
-    } catch (err) {
+  async getCommentsByPostId(postId: string, queryString: object): Promise<any>{
+    try{
+      const apiFeatures = new ApiFeatures(Comment.find({postId: postId }), queryString)
+      .filter()
+      .sort()
+      .paginate();
+    return apiFeatures
+    }catch (err){
       throw err;
     }
   }
