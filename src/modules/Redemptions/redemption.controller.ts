@@ -1,13 +1,17 @@
 import RedemptionService from "./redemption.services";
 import TransactionService from "../Transactions/transaction.services";
+import ProductService from "./../../modules/Products/product.services";
+import Users from "./../../common/models/user.model";
 import express from "express";
 import { IProduct, Product } from "./../../common/models/product.model";
-import Users from "./../../common/models/user.model";
 import mongoose from "mongoose";
+import UserService from "../User/user.services";
 
 export default class RedeemptionController {
   private redemptionService: RedemptionService = new RedemptionService();
-
+  private transactionService: TransactionService = new TransactionService();
+  private productService: ProductService = new ProductService();
+  private userService: UserService = new UserService(Users);
   public createRedemption = async <RedemptionController>(
     req: express.Request,
     res: express.Response,
@@ -38,16 +42,14 @@ export default class RedeemptionController {
       ) {
         throw "Please login to get access";
       }
-      let user = await Users.findById(req.authenticatedUser._id);
+      let user = await this.userService.getUser({_id: req.authenticatedUser._id});
       if(user == null){
         throw "Invalid user";
       }
   
       product.quantity -= redemptionObj.quantity;
-      console.log(product);
       await product.save();
       redemptionObj.user_id = req.authenticatedUser._id;
-      //console.log(redemptionObj);
       const redemption = await this.redemptionService.createRedemption(
         redemptionObj
       );
@@ -58,7 +60,7 @@ export default class RedeemptionController {
       let transactionPoint = -product.price * redemptionObj.quantity;
       
       user.point.redeemPoint -= product.price * redemptionObj.quantity;
-      await Users.findOneAndUpdate({_id: user._id}, user);
+      await this.userService.updateUser(user._id, user);
 
       await transactionService.createTransaction({
         user_id: req.authenticatedUser._id,

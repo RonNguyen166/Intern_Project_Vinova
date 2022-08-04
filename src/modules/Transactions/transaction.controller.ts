@@ -2,6 +2,8 @@ import mongoose from "mongoose";
 import express from "express";
 import TransactionService from "./transaction.services";
 import TransactionDetailService from "../TransactionDetails/transactiondetail.services";
+import UserService from "./../../modules/User/user.services";
+
 
 import { Tag, ITag } from "../../common/models/tag.model";
 import Users from "../../common/models/user.model";
@@ -9,6 +11,7 @@ export default class TransactionController {
   private transactionService: TransactionService = new TransactionService();
   private transactionDetailService: TransactionDetailService =
     new TransactionDetailService();
+  private userService: UserService = new UserService(Users);
   public getAllTransactions = async <TransactionController>(
     req: express.Request,
     res: express.Response,
@@ -31,6 +34,7 @@ export default class TransactionController {
       });
     }
   };
+
   public getTransaction = async <TransactionController>(
     req: express.Request,
     res: express.Response,
@@ -52,6 +56,8 @@ export default class TransactionController {
       });
     }
   };
+
+
   public getTransactionByUserId = async <TransactionController>(
     req: express.Request,
     res: express.Response,
@@ -64,7 +70,7 @@ export default class TransactionController {
       const transactions = await this.transactionService.getTransactionByUserId(
         req.authenticatedUser._id
       );
-        console.log(transactions);
+
       var totalPointsReceived = 0;
       var totalPointsGiven = 0;
       var totalRedemptions = 0;
@@ -73,10 +79,7 @@ export default class TransactionController {
           totalPointsReceived += transactions[i].point;
         }
         else if(transactions[i].type === "Give Pt"){
-          //console.log("----------");
-          //console.log(transactions[i].point);
           totalPointsGiven = totalPointsGiven + transactions[i].point;
-          //console.log(totalPointsGiven);
         }
         else if(transactions[i].type === "Redemption"){
           totalRedemptions += 1;
@@ -108,7 +111,6 @@ export default class TransactionController {
     next: express.NextFunction
   ) => {
     try {
-      // +100 @Dana #vinova-family Team HN cảm ơn em :))
       const postBody = req.body?.post;
       console.log(req.body);
       const transactionObj: any = {};
@@ -116,20 +118,19 @@ export default class TransactionController {
       if (!req.authenticatedUser) {
         throw "Please login to get access";
       }
-      let fromUser: any = await Users.findById(req.authenticatedUser._id);
-      console.log("FROMUSER: " + fromUser.point.givePoint);
+      let fromUser: any = await this.userService.getUser({_id: req.authenticatedUser._id});
+    
       if(fromUser == null){
         throw "Invalid user!";
       }
       transactionObj.user_id = req.authenticatedUser._id;
-      //console.log(transactionObj.user_id);
       let postToken = postBody.split(" ");
       
       
 
       transactionObj.type = "Give Pt";
 
-      //console.log(transactionObj.point, typeof transactionObj.point);
+
       let toUsersArray = [];
       let tagStrings = [];
       for (let i = 1; i < postToken.length; i++) {
