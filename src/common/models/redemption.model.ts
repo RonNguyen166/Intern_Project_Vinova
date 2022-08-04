@@ -22,7 +22,7 @@ const schema = new mongoose.Schema<IRedemption>(
       type: Number,
       required: [true, "A redemption must have a valid quantity"],
     },
-    user_id: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+    user_id: { type: mongoose.Schema.Types.ObjectId, ref: "Users" },
     product_id: { type: mongoose.Schema.Types.ObjectId, ref: "Product" },
   },
   { timestamps: true }

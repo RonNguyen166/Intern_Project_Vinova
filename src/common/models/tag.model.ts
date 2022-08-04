@@ -16,7 +16,7 @@ const schema = new mongoose.Schema<ITag>(
     },
     amount: {
       type: Number,
-      required: true,
+      default: 0
     },
   },
   {
