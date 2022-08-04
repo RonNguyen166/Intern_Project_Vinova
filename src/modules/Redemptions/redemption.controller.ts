@@ -23,7 +23,7 @@ export default class RedeemptionController {
       if (!req.body.quantity) {
         throw "Please provide quantity";
       }
-      const product = await Product.findOne({ _id: redemptionObj.product_id });
+      const product = await this.productService.getProduct(redemptionObj.product_id);
       if (!product) {
         throw "Please select a valid product to redeem";
       }
