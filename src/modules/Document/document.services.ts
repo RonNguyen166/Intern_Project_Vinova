@@ -1,7 +1,7 @@
 import mongoose, { Model } from "mongoose";
 import Document, { IDocument } from "../../common/models/document.model";
 import { BaseRepository } from "../../common/repository/base.repository";
-import AppError from "../../utils/AppError";
+import AppError from "../../utils/appError";
 export default class DocumentService extends BaseRepository<IDocument> {
   constructor(public readonly documentRepository: Model<IDocument>) {
     super(documentRepository);

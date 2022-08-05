@@ -3,7 +3,11 @@ import Comment, { IComment } from "../../common/models/comment.model";
 import Post from "../../common/models/post.model";
 import { BaseRepository } from "../../common/repository/base.repository";
 import AppError from "../../utils/appError";
+<<<<<<< HEAD
 import { ErrorMessages, ErrorResponsesCode } from "../../utils/constants";
+=======
+import { ErrorResponsesCode } from "../../utils/constants";
+>>>>>>> 9efa48f488fa15b736bf438a2b7329a3b8e563c8
 import ApiFeatures from "../../utils/apiFeatures";
 export default class CommentService extends BaseRepository<IComment> {
   constructor(public readonly commentRepository: Model<IComment>) {
