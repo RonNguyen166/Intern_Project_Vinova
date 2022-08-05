@@ -17,11 +17,11 @@ export default class CronExec{
                     if(users[i].point){
                         if(users[i].role === "member")
                         {   
-                            console.log("i: " + i);
-                            console.log(users[i].point.givePoint);
+                            //console.log("i: " + i);
+                            //console.log(users[i].point.givePoint);
                             users[i].point.givePoint += 50;
-                            console.log(users[i].point.givePoint);
-                            console.log("-------------------");
+                            //console.log(users[i].point.givePoint);
+                            //console.log("-------------------");
                         }
                         else if(users[i].role === "vice lead"){
                             users[i].point.givePoint += 100; 
