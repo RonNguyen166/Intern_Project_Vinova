@@ -3,9 +3,20 @@ import ApiFeatures from "../../utils/apiFeatures";
 export default class TagService {
   public async getAllTag() {
     try {
+      
       const tags = await Tag.find();
       return tags;
     } catch (err) {
+      throw err;
+    }
+  }
+  public async getAllTagWithFilter(queryString: object) {
+    try{
+      const apiFeatures = new ApiFeatures(Tag.find(), queryString).
+      filter().sort().paginate();
+      const tags = await apiFeatures.query;
+      return tags;
+    }catch(err){
       throw err;
     }
   }

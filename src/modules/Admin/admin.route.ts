@@ -11,7 +11,7 @@ import * as userValidation from "../../modules/User/user.schema";
 import productValidation from "../../modules/Products/product.schema";
 import * as categoryValidation from "../../modules/Category/category.schema";
 import * as documentValidation from "../../modules/Document/document.schema";
-import { upload } from "../../common/services/upload.service";
+import { upload } from "../../common/services/upload2.service";
 
 export default class AdminRoute {
   public router: Router = Router();

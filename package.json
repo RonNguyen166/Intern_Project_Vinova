@@ -14,6 +14,7 @@
   "dependencies": {
     "@aws-sdk/client-s3": "^3.137.0",
     "@aws-sdk/s3-request-presigner": "^3.137.0",
+    "aws-sdk": "^2.1188.0",
     "bcrypt": "^5.0.1",
     "dotenv": "^16.0.1",
     "express": "^4.18.1",
@@ -22,8 +23,10 @@
     "moment": "^2.29.4",
     "mongoose": "^6.4.4",
     "multer": "^1.4.5-lts.1",
+    "node-cron": "^3.0.1",
     "nodemailer": "^6.7.7",
     "ts-node": "^10.9.1",
+    "tsc": "^2.0.4",
     "typescript": "^4.7.4",
     "uuid": "^8.3.2"
   },
@@ -36,6 +39,7 @@
     "@types/jsonwebtoken": "^8.5.8",
     "@types/multer": "^1.4.7",
     "@types/node": "^18.6.3",
+    "@types/node-cron": "^3.0.2",
     "@types/nodemailer": "^6.4.4",
     "@types/pug": "^2.0.6",
     "@types/uuid": "^8.3.4",

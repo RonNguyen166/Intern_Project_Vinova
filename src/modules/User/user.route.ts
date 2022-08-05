@@ -10,7 +10,7 @@ import {
 } from "./user.schema";
 import UserController from "./user.controller";
 import { isAuthen, isAuthor } from "../../middlewares/authen.middleware";
-import { upload } from "../../common/services/upload.service";
+import { upload } from "../../common/services/upload2.service";
 export default class UserRoute {
   public router: Router = Router();
   private userController = new UserController();
