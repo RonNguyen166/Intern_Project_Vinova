@@ -9,6 +9,8 @@ export interface IPost extends IBase {
   category: Schema.Types.ObjectId;
   views: number;
   comments: Schema.Types.ObjectId[];
+  favorites: Schema.Types.ObjectId[];
+  toView: Function;
 }
 
 const postSchema: Schema = new Schema<IPost>(
@@ -20,14 +22,15 @@ const postSchema: Schema = new Schema<IPost>(
     category: { type: Schema.Types.ObjectId, ref: "Categories" },
     views: { type: Number, default: 0 },
     comments: [{ type: Schema.Types.ObjectId, ref: "Comments" }],
+    favorites: [{ type: Schema.Types.ObjectId, ref: "Users" }],
   }),
   { timestamps: { createdAt: "created_at", updatedAt: "updated_at" } }
 );
 
 postSchema.index({ title: "text", tags: "text", content: "text", category: 1 });
 
-postSchema.methods.increaseAmount = async function (): Promise<Error | number> {
-  return this.views++;
+postSchema.methods.toView = async function (): Promise<Error | number> {
+  return ++this.views && this.save();
 };
 
 export default model<IPost>("Posts", postSchema);

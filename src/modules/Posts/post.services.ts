@@ -40,6 +40,7 @@ export default class PostService extends BaseRepository<IPost> {
         .populate("tags", "name")
         .populate("category", "name")
         .populate("user_id", "fullName email photo")
+        .populate("favorites", "fullName email photo")
         .populate("comments", "content user_id parent_id")
         .exec();
       return posts;
@@ -55,6 +56,7 @@ export default class PostService extends BaseRepository<IPost> {
         .populate("tags", "name")
         .populate("category", "name")
         .populate("user_id", "fullName email photo")
+        .populate("favorites", "fullName email photo")
         .populate("comments", "content user_id parent_id")
         .exec();
       return posts;
@@ -93,6 +95,7 @@ export default class PostService extends BaseRepository<IPost> {
         .populate("tags", "name")
         .populate("category", "name")
         .populate("user_id", "fullName email photo")
+        .populate("favorites", "fullName email photo")
         .populate("comments", "content user_id parent_id")
         .select({ isDelete: 0 })
         .limit(_size)
@@ -119,6 +122,7 @@ export default class PostService extends BaseRepository<IPost> {
         .populate("tags", "name")
         .populate("category", "name")
         .populate("user_id", "fullName email photo")
+        .populate("favorites", "fullName email photo")
         .populate("comments", "content user_id parent_id")
         .select({ isDelete: 0 })
         .exec();
@@ -172,6 +176,7 @@ export default class PostService extends BaseRepository<IPost> {
         .populate("tags", "name")
         .populate("category", "name")
         .populate("user_id", "fullName email photo")
+        .populate("favorites", "fullName email photo")
         .populate("comments", "content user_id parent_id")
         .exec();
       return post;
@@ -193,6 +198,41 @@ export default class PostService extends BaseRepository<IPost> {
           await tag?.decreaseAmount();
         })
       );
+    } catch (err) {
+      throw err;
+    }
+  }
+
+  async toFavorite(postId: string, user: any): Promise<any> {
+    try {
+      if (!user) {
+        throw new AppError(ErrorResponsesCode.BAD_REQUEST, "Please login");
+      }
+      const post = await this.getOne({ _id: postId });
+      if (!post)
+        throw new AppError(ErrorResponsesCode.NOT_FOUND, "Post not found");
+
+      const check = post.favorites.findIndex((userId: any) =>
+        userId.equals(user._id)
+      );
+      if (check != -1) {
+        post.favorites.splice(check, 1);
+      } else {
+        post.favorites.push(user._id);
+      }
+      await post.save();
+    } catch (err) {
+      throw err;
+    }
+  }
+
+  async toView(postId: string): Promise<any> {
+    try {
+      const post = await this.getOne({ _id: postId });
+      if (!post) {
+        throw new AppError(ErrorResponsesCode.NOT_FOUND, "Post not found");
+      }
+      await post.toView();
     } catch (err) {
       throw err;
     }

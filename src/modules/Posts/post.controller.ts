@@ -89,4 +89,17 @@ export default class PostController {
     );
     return successReponse(req, res, { isDelete: true }, "Delete Successfully");
   });
+
+  public toView = catchAsync(async (req: Request, res: Response) => {
+    await this.postService.toView(req.params.id);
+    return successReponse(req, res, undefined, "Successfully");
+  });
+
+  public toFavorite = catchAsync(async (req: Request, res: Response) => {
+    await this.postService.toFavorite(
+      req.params.id,
+      (<any>req).authenticatedUser
+    );
+    return successReponse(req, res, undefined, "Successfully");
+  });
 }

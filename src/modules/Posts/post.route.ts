@@ -69,5 +69,17 @@ export default class PostRoute {
       )
       .patch(isAuthen, this.commentController.updateComment)
       .delete(isAuthen, this.commentController.deleteComment);
+
+    this.router.patch(
+      "/:id/to-view",
+      validate(postValidation.toView),
+      this.postController.toView
+    );
+    this.router.patch(
+      "/:id/to-favorite",
+      isAuthen,
+      validate(postValidation.toView),
+      this.postController.toFavorite
+    );
   }
 }

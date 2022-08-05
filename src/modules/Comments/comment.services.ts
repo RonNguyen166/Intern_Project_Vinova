@@ -144,6 +144,8 @@ export default class CommentService extends BaseRepository<IComment> {
       throw err;
     }
   }
+
+  
   async getCommentsByPostId(postId: string, queryString: object): Promise<any> {
     try {
       const apiFeatures = new ApiFeatures(

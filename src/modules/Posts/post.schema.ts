@@ -55,4 +55,10 @@ const updateOne = Joi.object({
   }),
 });
 
-export { create, getOne, updateOne, deleteOne, getFilter, getComments };
+const toView = Joi.object({
+  params: Joi.object().keys({
+    id: Joi.required().custom(objectId),
+  }),
+});
+
+export { create, getOne, updateOne, deleteOne, getFilter, getComments, toView };
