@@ -16,12 +16,14 @@ export default class UserController {
   public userService: UserService = new UserService(User);
   public s3Upload: S3Upload = new S3Upload();
   public createUser = catchAsync(async (req: Request, res: Response) => {
-    const url = await this.s3Upload.put(req.file);
-    req.body.photo = url;
+    if (req.file) {
+      const url = await this.s3Upload.put(req.file);
+      req.body.photo = url;
+    }
     const data: IUserCreate = req.body;
     const result = await this.userService.createUser(data);
     const resultData: object = {
-      user: serializerGetUser(result),
+      user: serializerUser(result),
     };
     return successReponse(req, res, resultData, "Create Successfully", 201);
   });
@@ -29,9 +31,7 @@ export default class UserController {
   public getAllUsers = catchAsync(async (req: Request, res: Response) => {
     const results = await this.userService.getAllUsers();
 
-    const serializedResults = results.map((ele: any) =>
-      ele.id ? serializerGetUser(ele) : serializerUser(ele)
-    );
+    const serializedResults = results.map((ele: any) => serializerGetUser(ele));
     const resultData: object = {
       users: serializedResults,
     };
@@ -42,7 +42,7 @@ export default class UserController {
     const dataQuery: IUserGet = { ...req.query };
     const results = await this.userService.getFilterUser(dataQuery);
     const serializedResults = results?.data.map((ele: any) =>
-      ele.id ? serializerGetUser(ele) : serializerUser(ele)
+      serializerGetUser(ele)
     );
     const resultData: object = {
       page: req.query.page ? parseInt(<string>req.query.page) : 1,
@@ -71,7 +71,7 @@ export default class UserController {
 
     const result = await this.userService.updateUser(req.params.id, dataBody);
     const resultData: object = {
-      user: serializerGetUser(result),
+      user: serializerUser(result),
     };
     return successReponse(req, res, resultData, "Updated Succesfully");
   });
@@ -88,6 +88,18 @@ export default class UserController {
       user: serializerGetUser(result),
     };
     return successReponse(req, res, resultData, "Updated Succesfully");
+  });
+
+  public getProfile = catchAsync(async (req: Request, res: Response) => {
+    const result = await this.userService.getUser({
+      _id: (<any>req).authenticatedUser._id,
+    });
+    result.photoUrl = await this.s3Upload.get(result.photo);
+    console.log(result);
+    const resultData: object = {
+      user: serializerGetUser(result),
+    };
+    return successReponse(req, res, resultData, "Get Succesfully");
   });
 
   public deleteUser = catchAsync(async (req: Request, res: Response) => {

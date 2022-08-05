@@ -23,7 +23,7 @@ export abstract class BaseRepository<T> implements IWrite<T>, IRead<T> {
       const filter: object = { isDelete: false };
       const results = await this.entity.find(filter).sort({ created_at: -1 });
 
-      if (!results)
+      if (!results.length)
         throw new AppError(
           ErrorResponsesCode.NOT_FOUND,
           ErrorMessages.NOT_FOUND
@@ -36,13 +36,13 @@ export abstract class BaseRepository<T> implements IWrite<T>, IRead<T> {
   public async getOne(filter: object): Promise<T> {
     try {
       filter = { ...filter, isDelete: false };
-      const results = await this.entity.findOne(filter).exec();
-      if (!results)
+      const result = await this.entity.findOne(filter).exec();
+      if (!result)
         throw new AppError(
           ErrorResponsesCode.NOT_FOUND,
           ErrorMessages.NOT_FOUND
         );
-      return results;
+      return result;
     } catch (error) {
       throw error;
     }
@@ -74,8 +74,8 @@ export abstract class BaseRepository<T> implements IWrite<T>, IRead<T> {
         .exec();
       if (!results)
         throw new AppError(
-          ErrorResponsesCode.NOT_FOUND,
-          ErrorMessages.NOT_FOUND
+          ErrorResponsesCode.BAD_REQUEST,
+          ErrorMessages.BAD_REQUEST
         );
       return results;
     } catch (error) {

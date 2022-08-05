@@ -1,4 +1,5 @@
 import Joi, { ObjectSchema } from "joi";
+import { objectId } from "../../common/validation/custom.vaidation";
 import { Roles } from "../../utils/constants";
 
 function password(value: string, helpers: any) {
@@ -26,6 +27,7 @@ const create = Joi.object({
       givePoint: Joi.number().required(),
       redeemPoint: Joi.number().required(),
     }),
+    photo: Joi.any(),
     password: Joi.string().required().min(6).max(40).custom(password),
     passwordConfirm: Joi.any()
       .equal(Joi.ref("password"))
@@ -49,13 +51,13 @@ const getAll = Joi.object({
 
 const getOne: ObjectSchema = Joi.object({
   params: Joi.object().keys({
-    id: Joi.string(),
+    id: Joi.string().custom(objectId),
   }),
 });
 
 const updateOne: ObjectSchema = Joi.object({
   params: Joi.object().keys({
-    id: Joi.string().required(),
+    id: Joi.required().custom(objectId),
   }),
   body: Joi.object().keys({
     fullName: Joi.string(),
@@ -80,7 +82,7 @@ const updateOne: ObjectSchema = Joi.object({
 });
 const deleteOne: ObjectSchema = Joi.object({
   params: Joi.object().keys({
-    id: Joi.string(),
+    id: Joi.string().custom(objectId),
   }),
 });
 

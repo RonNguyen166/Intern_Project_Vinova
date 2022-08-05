@@ -12,8 +12,9 @@ export default (schema: ObjectSchema) =>
       "body",
     ]);
     const object = pick(req, Object.keys(validSchema));
+    //console.log("OBJ " + object);
     const { value, error } = schema.validate(object);
-
+    //console.log("VALUE " + value);
     if (error) {
       const errorMessage: string = error.details
         .map((details) => details.message)
@@ -21,5 +22,6 @@ export default (schema: ObjectSchema) =>
       return next(new AppError(ErrorResponsesCode.BAD_REQUEST, errorMessage));
     }
     Object.assign(req, value);
+
     return next();
   };

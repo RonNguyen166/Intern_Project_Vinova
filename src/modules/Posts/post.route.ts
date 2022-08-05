@@ -1,23 +1,73 @@
-import express from "express";
-import CommentController from "../Comments/comment.controller";
+import { Router } from "express";
 import PostController from "./post.controller";
-import {isAuthor, isAuthen} from "./../../middlewares/authen.middleware";
-import { upload } from "../../common/services/upload2.service";
 
-const commentController = new CommentController();
-const postController = new PostController();
+import validate from "../../middlewares/validate.middleware";
+import * as postValidation from "./post.schema";
+import * as commentValidation from "../Comments/comment.schema";
+import CommentController from "../Comments/comment.controller";
 
-const router = express.Router();
+import { isAuthen } from "../../middlewares/authen.middleware";
 
-router
-  .route("/")
-  .get(postController.getAllPost)
-  .post(isAuthen, isAuthor, upload.single("photo"),postController.createPost);
-router.route("/:postId/comments").get(commentController.getCommentsByPostId);
+export default class PostRoute {
+  public router: Router = Router();
+  private postController = new PostController();
+  private commentController = new CommentController();
 
-router
-  .route("/:postId")
-  .post(postController.createPost)
-  .patch(postController.updatePost)
-  .delete(postController.deletePost);
-export default router;
+  constructor() {
+    this.initializeRoute();
+  }
+  public initializeRoute() {
+    this.router
+      .route("/")
+      .get(this.postController.getAllPosts)
+      .post(
+        isAuthen,
+        validate(postValidation.create),
+        this.postController.createPost
+      );
+
+    this.router
+      .route("/filter")
+      .get(
+        validate(postValidation.getFilter),
+        this.postController.getFilterPosts
+      );
+    this.router.get("/my-posts", isAuthen, this.postController.getMyPosts);
+
+    this.router.get(
+      "/:id/comments",
+      validate(postValidation.getComments),
+      this.commentController.getCommentsByPost
+    );
+
+    this.router
+      .route("/:id")
+      .get(validate(postValidation.getOne), this.postController.getPost)
+      .patch(
+        isAuthen,
+        validate(postValidation.updateOne),
+        this.postController.updatePost
+      )
+      .delete(
+        isAuthen,
+        validate(postValidation.deleteOne),
+        this.postController.deletePost
+      );
+
+    this.router.post(
+      "/comments",
+      isAuthen,
+      validate(commentValidation.create),
+      this.commentController.createComment
+    );
+
+    this.router
+      .route("/:postId/comments/:commentId")
+      .get(
+        validate(commentValidation.getOne),
+        this.commentController.getCommentByPost
+      )
+      .patch(isAuthen, this.commentController.updateComment)
+      .delete(isAuthen, this.commentController.deleteComment);
+  }
+}

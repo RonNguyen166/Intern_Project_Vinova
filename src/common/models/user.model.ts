@@ -1,5 +1,5 @@
 import bcrypt from "bcrypt";
-import { Document, Schema, model, SchemaTypes } from "mongoose";
+import { Schema, model } from "mongoose";
 import { Roles } from "../../utils/constants";
 import { SchemaBase, IBase } from "./base.model";
 import pointModel, { IPoint } from "./point.model";
@@ -29,7 +29,10 @@ const UserSchema: Schema = new Schema<IUser>(
       required: true,
     },
     subName: String,
-    alias: String,
+    alias: {
+      type: String,
+      unique: true,
+    },
     email: {
       type: String,
       required: true,

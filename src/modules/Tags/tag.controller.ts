@@ -9,7 +9,7 @@ export default class TagController {
     next: express.NextFunction
   ) => {
     try {
-      const tags = await this.tagService.getAllTag();
+      const tags = await this.tagService.getAllTagWithFilter(req.query);
       res.status(200).json({
         status: "success",
         length: tags.length,

@@ -1,4 +1,5 @@
 import express, { Application, RequestHandler, Router } from "express";
+import { isAuthen, isAuthor } from "../../middlewares/authen.middleware";
 import validate from "../../middlewares/validate.middleware";
 import { create, getAll, getOne, updateOne, deleteOne } from "./document.schema";
 import DocumentController from "./document.controller";
@@ -12,12 +13,28 @@ export default class DocumentRoute {
   public intializeRoute(): void {
     this.router
       .route(`${this.path}/:id`)
-      .get(validate(getOne), this.documentController.getDocument)
-      .patch(validate(updateOne), this.documentController.updateDocument)
-      .delete(validate(deleteOne), this.documentController.deleteDocument)
+      .get( 
+        validate(getOne), 
+        this.documentController.getDocument)
+      .patch(
+        isAuthen, 
+        isAuthor, 
+        validate(updateOne), 
+        this.documentController.updateDocument)
+      .delete(
+        isAuthen, 
+        isAuthor, 
+        validate(deleteOne), 
+      this.documentController.deleteDocument)
     this.router
       .route(`${this.path}/`)
-      .get(validate(getAll), this.documentController.getAllDocuments)
-      .post(validate(create), this.documentController.createDocument);
+      .get( 
+        validate(getAll), 
+        this.documentController.getAllDocuments)
+      .post(
+        isAuthen, 
+        isAuthor, 
+        validate(create), 
+      this.documentController.createDocument);
   }
 }

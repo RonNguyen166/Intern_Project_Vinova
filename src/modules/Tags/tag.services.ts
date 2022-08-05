@@ -1,4 +1,4 @@
-import { ITag, Tag } from "./../../common/models/tag.model";
+import Tag, { ITag } from "./../../common/models/tag.model";
 import ApiFeatures from "../../utils/apiFeatures";
 export default class TagService {
   public async getAllTag() {
