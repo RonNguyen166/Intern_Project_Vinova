@@ -66,7 +66,7 @@ export default class PostController {
     const resultData: object = {
       post: serializerGetPost(result),
     };
-    return successReponse(req, res, resultData, "Update Successfully");
+    return successReponse(req, res, resultData, "Get Successfully");
   });
 
   public updatePost = catchAsync(async (req: Request, res: Response) => {

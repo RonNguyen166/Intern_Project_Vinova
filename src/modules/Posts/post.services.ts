@@ -39,7 +39,7 @@ export default class PostService extends BaseRepository<IPost> {
       const posts = await Post.find(filter)
         .populate("tags")
         .populate("category")
-        // .populate("comments")
+        .populate("comments")
         .populate("user_id")
         .exec();
       return posts;
@@ -55,7 +55,7 @@ export default class PostService extends BaseRepository<IPost> {
         .populate("tags")
         .populate("category")
         .populate("user_id")
-        // .populate("comments")
+        .populate("comments")
         .exec();
       return posts;
     } catch (err) {
@@ -92,7 +92,7 @@ export default class PostService extends BaseRepository<IPost> {
       posts = await Post.find(finalFilter)
         .populate("tags")
         .populate("category")
-        // .populate("comments")
+        .populate("comments")
         .populate("user_id")
         .select({ isDelete: 0 })
         .limit(_size)
@@ -171,7 +171,7 @@ export default class PostService extends BaseRepository<IPost> {
       const post = await Post.findByIdAndUpdate(postId, data, { new: true })
         .populate("tags")
         .populate("category")
-        // .populate("comments")
+        .populate("comments")
         .populate("user_id")
         .exec();
       return post;

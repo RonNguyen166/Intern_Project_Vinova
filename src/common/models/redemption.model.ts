@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 
 export interface IRedemption {
-  user_id: mongoose.Schema.Types.ObjectId;
+  user: mongoose.Schema.Types.ObjectId;
   product_id: mongoose.Schema.Types.ObjectId;
   type: string;
   quantity: number;
@@ -22,7 +22,7 @@ const schema = new mongoose.Schema<IRedemption>(
       type: Number,
       required: [true, "A redemption must have a valid quantity"],
     },
-    user_id: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+    user: { type: mongoose.Schema.Types.ObjectId, ref: "Users" },
     product_id: { type: mongoose.Schema.Types.ObjectId, ref: "Product" },
   },
   { timestamps: true }

@@ -3,10 +3,12 @@ import { isAuthen } from "./../../middlewares/authen.middleware";
 import PostController from "./post.controller";
 import validate from "../../middlewares/validate.middleware";
 import { create, getOne, updateOne, deleteOne, getFilter } from "./post.schema";
+import CommentController from "../Comments/comment.controller";
 
 export default class PostRoute {
   public router: Router = Router();
   private postController = new PostController();
+  private commentController = new CommentController();
 
   constructor() {
     this.initializeRoute();
@@ -26,5 +28,16 @@ export default class PostRoute {
       .get(this.postController.getPost)
       .patch(isAuthen, validate(updateOne), this.postController.updatePost)
       .delete(isAuthen, validate(deleteOne), this.postController.deletePost);
+
+    this.router.post(
+      "/comments",
+      isAuthen,
+      this.commentController.createComment
+    );
+    this.router.get("/:id/comments", this.commentController.getCommentsByPost);
+    this.router
+      .route("/:postId/comments/:commentId")
+      .get(this.commentController.getCommentByPost)
+      .delete(isAuthen, this.commentController.deleteComment);
   }
 }

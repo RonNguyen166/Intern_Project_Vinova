@@ -11,6 +11,7 @@ import TagRouter from "./Tags/tag.route";
 import TransactionRouter from "./Transactions/transaction.route";
 import PostRouter from "./Posts/post.route";
 import AdminRoute from "./Admin/admin.route";
+import CommentRoute from "./Comments/comment.route";
 
 export default class CombineRoute {
   private userRoute = new UserRouter();
@@ -19,6 +20,7 @@ export default class CombineRoute {
   // private branchRoute = new BranchRoute();
   private categoryRoute = new CategoryRoute();
   private adminRoute = new AdminRoute();
+  private commentRoute = new CommentRoute();
 
   // private productRoute = ProductRouter;
   // private redemptionRoute = RedemptionRouter;
@@ -38,5 +40,6 @@ export default class CombineRoute {
     // app.use("/v1", this.branchRoute.router);
     app.use("/v1", this.categoryRoute.router);
     app.use("/v1/admin", this.adminRoute.router);
+    app.use("/v1/comments", this.commentRoute.router);
   }
 }

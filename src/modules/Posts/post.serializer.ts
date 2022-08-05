@@ -34,7 +34,7 @@ export function serializerGetPost(model: any): IResultPost {
     content: model.content,
     category: model.category,
     views: model.views,
-    comments: model.comment,
+    comments: model.comments,
     created_at: model.created_at,
   };
 }

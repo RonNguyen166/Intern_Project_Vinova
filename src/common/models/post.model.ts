@@ -8,7 +8,7 @@ export interface IPost extends IBase {
   content: string;
   category: Schema.Types.ObjectId;
   views: number;
-  comments: string;
+  comments: Schema.Types.ObjectId[];
 }
 
 const postSchema: Schema = new Schema<IPost>(

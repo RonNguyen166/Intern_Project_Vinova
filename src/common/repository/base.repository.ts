@@ -36,13 +36,13 @@ export abstract class BaseRepository<T> implements IWrite<T>, IRead<T> {
   public async getOne(filter: object): Promise<T> {
     try {
       filter = { ...filter, isDelete: false };
-      const results = await this.entity.findOne(filter).exec();
-      if (!results)
+      const result = await this.entity.findOne(filter).exec();
+      if (!result)
         throw new AppError(
           ErrorResponsesCode.NOT_FOUND,
           ErrorMessages.NOT_FOUND
         );
-      return results;
+      return result;
     } catch (error) {
       throw error;
     }

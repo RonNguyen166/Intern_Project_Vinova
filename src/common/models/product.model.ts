@@ -32,7 +32,7 @@ const schema: mongoose.Schema = new mongoose.Schema<IProduct>(
     images: {
       type: [String],
     },
-    user_id: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+    user_id: { type: mongoose.Schema.Types.ObjectId, ref: "Users" },
     branch_id: { type: mongoose.Schema.Types.ObjectId, ref: "Branch" },
     status: {
       type: mongoose.Schema.Types.Boolean,

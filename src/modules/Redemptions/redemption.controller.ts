@@ -1,12 +1,17 @@
 import RedemptionService from "./redemption.services";
 import TransactionService from "../Transactions/transaction.services";
+import ProductService from "./../../modules/Products/product.services";
+import Users from "./../../common/models/user.model";
 import express from "express";
 import { IProduct, Product } from "./../../common/models/product.model";
 import mongoose from "mongoose";
+import UserService from "../User/user.services";
 
 export default class RedeemptionController {
   private redemptionService: RedemptionService = new RedemptionService();
-
+  private transactionService: TransactionService = new TransactionService();
+  private productService: ProductService = new ProductService();
+  private userService: UserService = new UserService(Users);
   public createRedemption = async <RedemptionController>(
     req: express.Request,
     res: express.Response,
@@ -18,7 +23,7 @@ export default class RedeemptionController {
       if (!req.body.quantity) {
         throw "Please provide quantity";
       }
-      const product = await Product.findOne({ _id: redemptionObj.product_id });
+      const product = await this.productService.getProduct(redemptionObj.product_id);
       if (!product) {
         throw "Please select a valid product to redeem";
       }
@@ -37,12 +42,14 @@ export default class RedeemptionController {
       ) {
         throw "Please login to get access";
       }
-
+      let user = await this.userService.getUser({_id: req.authenticatedUser._id});
+      if(user == null){
+        throw "Invalid user";
+      }
+  
       product.quantity -= redemptionObj.quantity;
-      console.log(product);
       await product.save();
-      redemptionObj.user_id = req.authenticatedUser._conditions._id;
-      //console.log(redemptionObj);
+      redemptionObj.user_id = req.authenticatedUser._id;
       const redemption = await this.redemptionService.createRedemption(
         redemptionObj
       );
@@ -51,10 +58,13 @@ export default class RedeemptionController {
       const transactionService = new TransactionService();
       let transactionSubject = `${product.title} x${redemptionObj.quantity}`;
       let transactionPoint = -product.price * redemptionObj.quantity;
+      
+      user.point.redeemPoint -= product.price * redemptionObj.quantity;
+      await this.userService.updateUser(user._id, user);
 
       await transactionService.createTransaction({
-        user_id: req.authenticatedUser._conditions._id,
-        type: "Redeemption",
+        user_id: req.authenticatedUser._id,
+        type: "Redemption",
         subject: transactionSubject,
         point: transactionPoint,
       });
@@ -65,6 +75,7 @@ export default class RedeemptionController {
         redemption,
       });
     } catch (err) {
+      console.log(err);
       return res.status(400).json({
         status: "error",
         message: err,

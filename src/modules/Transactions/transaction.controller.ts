@@ -2,16 +2,16 @@ import mongoose from "mongoose";
 import express from "express";
 import TransactionService from "./transaction.services";
 import TransactionDetailService from "../TransactionDetails/transactiondetail.services";
-import {
-  TransactionDetail,
-  ITransactionDetail,
-} from "../../common/models/transactiondetail.model";
+import UserService from "./../../modules/User/user.services";
+
+
 import { Tag, ITag } from "../../common/models/tag.model";
-import User from "../../common/models/user.model";
+import Users from "../../common/models/user.model";
 export default class TransactionController {
   private transactionService: TransactionService = new TransactionService();
   private transactionDetailService: TransactionDetailService =
     new TransactionDetailService();
+  private userService: UserService = new UserService(Users);
   public getAllTransactions = async <TransactionController>(
     req: express.Request,
     res: express.Response,
@@ -27,12 +27,14 @@ export default class TransactionController {
         },
       });
     } catch (err) {
+      console.log(err);
       res.status(401).json({
         status: "error",
         message: err,
       });
     }
   };
+
   public getTransaction = async <TransactionController>(
     req: express.Request,
     res: express.Response,
@@ -47,12 +49,15 @@ export default class TransactionController {
         data: transaction,
       });
     } catch (err) {
+      console.log(err);
       res.status(400).json({
         status: "error",
         message: err,
       });
     }
   };
+
+
   public getTransactionByUserId = async <TransactionController>(
     req: express.Request,
     res: express.Response,
@@ -63,17 +68,36 @@ export default class TransactionController {
         throw "Please login to get access";
       }
       const transactions = await this.transactionService.getTransactionByUserId(
-        req.authenticatedUser._conditions._id
+        req.authenticatedUser._id
       );
+
+      var totalPointsReceived = 0;
+      var totalPointsGiven = 0;
+      var totalRedemptions = 0;
+      for(let i = 0; i < transactions.length; i++){
+        if(transactions[i].type === "Receive Pt"){
+          totalPointsReceived += transactions[i].point;
+        }
+        else if(transactions[i].type === "Give Pt"){
+          totalPointsGiven = totalPointsGiven + transactions[i].point;
+        }
+        else if(transactions[i].type === "Redemption"){
+          totalRedemptions += 1;
+        }
+      }
+      totalPointsGiven *= -1; 
       res.status(200).json({
         status: "success",
         length: transactions.length,
         data: {
-          transactions,
+          points_received: totalPointsReceived,
+          points_given: totalPointsGiven,
+          redemptions: totalRedemptions,
+          transactions: transactions,
         },
       });
     } catch (err) {
-      //console.log(err);
+      console.log(err);
       res.status(400).json({
         status: "error",
         message: err,
@@ -87,19 +111,26 @@ export default class TransactionController {
     next: express.NextFunction
   ) => {
     try {
-      // +100 @Dana #vinova-family Team HN cảm ơn em :))
-      const postBody = req.body.post;
+      const postBody = req.body?.post;
+      console.log(req.body);
       const transactionObj: any = {};
       transactionObj.subject = postBody;
       if (!req.authenticatedUser) {
         throw "Please login to get access";
       }
-      transactionObj.user_id = req.authenticatedUser._conditions._id;
-      //console.log(transactionObj.user_id);
+      let fromUser: any = await this.userService.getUser({_id: req.authenticatedUser._id});
+    
+      if(fromUser == null){
+        throw "Invalid user!";
+      }
+      transactionObj.user_id = req.authenticatedUser._id;
       let postToken = postBody.split(" ");
+      
+      
+
       transactionObj.type = "Give Pt";
 
-      //console.log(transactionObj.point, typeof transactionObj.point);
+
       let toUsersArray = [];
       let tagStrings = [];
       for (let i = 1; i < postToken.length; i++) {
@@ -114,6 +145,16 @@ export default class TransactionController {
       transactionObj.point = `-${
         postToken[0].replace("+", "") * 1 * toUsersArray.length
       }`;
+
+
+      /* Check if user has enough point to give? */
+      let totalPointNeeded = parseInt(transactionObj.point.replace("-","" ));
+      
+      if (totalPointNeeded > fromUser.point.givePoint) {
+        throw "Not enough points to give"; 
+      }
+      fromUser.point.givePoint -= totalPointNeeded;
+      //fromUser.save();
 
       //console.log("toUsersArray: " + toUsersArray);
       //console.log("TAGSTRINGS: " + tagStrings);
@@ -153,12 +194,20 @@ export default class TransactionController {
       /* Check if received user exists */
       let toUsersIdArray = [];
       for (let i = 0; i < toUsersArray.length; i++) {
-        const receivedUser = await User.findOne({
-          name: toUsersArray[i],
+        const receivedUser = await Users.findOne({
+          alias: toUsersArray[i],
         });
+
         if (receivedUser == null) {
           throw "Received user not exist!";
         }
+        toUsersIdArray.push(receivedUser);
+      }
+      /* calculate point for each user in transaction and update them */
+      //console.log("TOUSERARRAY" + toUsersIdArray[0]);
+      for(let i = 0; i < toUsersIdArray.length; i++){
+        toUsersIdArray[i].point.givePoint += parseInt(postToken[0]);
+        await Users.findOneAndUpdate({_id: toUsersIdArray[i]._id}, toUsersIdArray[i]);
       }
 
       /* Create transaction */
@@ -180,25 +229,21 @@ export default class TransactionController {
       transDetailsObj.transaction_id = transaction._id;
       transDetailsObj.createdAt = transaction.createdAt;
       transDetailsObj.updatedAt = transaction.updatedAt;
-
+      
       for (let i = 0; i < toUsersArray.length; i++) {
-        //console.log(toUsersArray[i], toUsersArray.length);
-        transDetailsObj.user_id_to = await User.findOne({
+        transDetailsObj.user_id_to = await Users.findOne({
           name: toUsersArray[i],
         });
-
         transDetailsObj.user_id_to = transDetailsObj.user_id_to._id;
-
         transactionReceived.user_id = transDetailsObj.user_id_to;
-        //console.log(transactionReceived);
         await this.transactionService.createTransaction(transactionReceived);
-
-        //console.log(transDetailsObj.user_id_to);
         toUsersArray[i] = transDetailsObj.user_id_to;
-        await this.transactionDetailService.createTransDetail(transDetailsObj);
-        //console.log(transDetailsObj);
       }
-
+      transDetailsObj.user_id_to = toUsersArray;
+  
+      await this.transactionDetailService.createTransDetail(transDetailsObj);
+      /* Update score for Give User */
+      await Users.findOneAndUpdate({_id: fromUser._id}, fromUser);
       return res.status(201).json({
         status: "success",
         data: {
@@ -206,7 +251,7 @@ export default class TransactionController {
         },
       });
     } catch (err) {
-      //console.log(err);
+      console.log(err);
       return res.status(400).json({
         status: "error",
         message: err,
