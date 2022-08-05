@@ -39,10 +39,9 @@ export default class CommentService extends BaseRepository<IComment> {
     }
   }
   async getCommentsByPost(postId: string, limit: any): Promise<any> {
-    console.log(limit);
     const comments = await Comment.find({ post_id: postId })
-      .populate("parent_id")
-      .limit(parseInt(limit) || 0);
+      .limit(parseInt(limit) || 0)
+      .exec();
     return comments;
   }
 
@@ -51,7 +50,9 @@ export default class CommentService extends BaseRepository<IComment> {
     const comment = await Comment.findOne({
       post_id: postId,
       comment_id: commentId,
-    }).exec();
+    })
+      .populate("user_id", "fullName email photo")
+      .exec();
     if (!comment) {
       throw new AppError(
         ErrorResponsesCode.BAD_REQUEST,

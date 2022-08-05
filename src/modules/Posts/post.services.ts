@@ -37,10 +37,10 @@ export default class PostService extends BaseRepository<IPost> {
     try {
       let filter = { user_id: userId, isDelete: false };
       const posts = await Post.find(filter)
-        .populate("tags")
-        .populate("category")
-        .populate("comments")
-        .populate("user_id")
+        .populate("tags", "name")
+        .populate("category", "name")
+        .populate("user_id", "fullName email photo")
+        .populate("comments", "content user_id parent_id")
         .exec();
       return posts;
     } catch (err) {
@@ -52,10 +52,10 @@ export default class PostService extends BaseRepository<IPost> {
     try {
       let filter: object = { isDelete: false };
       const posts = await Post.find(filter)
-        .populate("tags")
-        .populate("category")
-        .populate("user_id")
-        .populate("comments")
+        .populate("tags", "name")
+        .populate("category", "name")
+        .populate("user_id", "fullName email photo")
+        .populate("comments", "content user_id parent_id")
         .exec();
       return posts;
     } catch (err) {
@@ -90,10 +90,10 @@ export default class PostService extends BaseRepository<IPost> {
           delete (<any>finalFilter)[key]
       );
       posts = await Post.find(finalFilter)
-        .populate("tags")
-        .populate("category")
-        .populate("comments")
-        .populate("user_id")
+        .populate("tags", "name")
+        .populate("category", "name")
+        .populate("user_id", "fullName email photo")
+        .populate("comments", "content user_id parent_id")
         .select({ isDelete: 0 })
         .limit(_size)
         .skip(_size * (_page - 1))
@@ -116,10 +116,10 @@ export default class PostService extends BaseRepository<IPost> {
   async getPost(filter: any): Promise<any> {
     try {
       const post = Post.findOne(filter)
-        .populate("tags")
-        .populate("category")
-        .populate("comments")
-        .populate("user_id")
+        .populate("tags", "name")
+        .populate("category", "name")
+        .populate("user_id", "fullName email photo")
+        .populate("comments", "content user_id parent_id")
         .select({ isDelete: 0 })
         .exec();
       if (!post) {
@@ -169,10 +169,10 @@ export default class PostService extends BaseRepository<IPost> {
         data.tags = arrayTags;
       }
       const post = await Post.findByIdAndUpdate(postId, data, { new: true })
-        .populate("tags")
-        .populate("category")
-        .populate("comments")
-        .populate("user_id")
+        .populate("tags", "name")
+        .populate("category", "name")
+        .populate("user_id", "fullName email photo")
+        .populate("comments", "content user_id parent_id")
         .exec();
       return post;
     } catch (err) {

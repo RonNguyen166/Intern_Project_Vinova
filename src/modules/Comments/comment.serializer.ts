@@ -17,6 +17,8 @@ export interface IResultComment {
   post_id: string;
   user_id: string;
   parent_id: string;
+  created_at: Date;
+  updated_at: Date;
 }
 
 export function serializerComment(model: any): IResponseComment {
@@ -40,5 +42,7 @@ export function serializerGetComment(model: any): IResultComment {
     user_id: model.user_id,
     post_id: model.post_id,
     parent_id: model.parent_id,
+    created_at: model.created_at,
+    updated_at: model.updated_at,
   };
 }

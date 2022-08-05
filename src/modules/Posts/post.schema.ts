@@ -28,6 +28,15 @@ const getOne = Joi.object({
   }),
 });
 
+const getComments = Joi.object({
+  params: Joi.object().keys({
+    id: Joi.string().custom(objectId),
+  }),
+  query: Joi.object().keys({
+    limit: Joi.number(),
+  }),
+});
+
 const deleteOne = Joi.object({
   params: Joi.object().keys({
     id: Joi.string().custom(objectId),
@@ -46,4 +55,4 @@ const updateOne = Joi.object({
   }),
 });
 
-export { create, getOne, updateOne, deleteOne, getFilter };
+export { create, getOne, updateOne, deleteOne, getFilter, getComments };

@@ -23,6 +23,7 @@ export interface IResultPost {
   views: number;
   comments: object[];
   created_at: Date;
+  updated_at: Date;
 }
 
 export function serializerGetPost(model: any): IResultPost {
@@ -32,10 +33,11 @@ export function serializerGetPost(model: any): IResultPost {
     title: model.title,
     tags: model.tags,
     content: model.content,
-    category: model.category,
+    category: model.category.name,
     views: model.views,
     comments: model.comments,
     created_at: model.created_at,
+    updated_at: model.updated_at,
   };
 }
 
@@ -46,7 +48,7 @@ export function serializerPost(model: any): IResponsePost {
     title: model.title,
     tags: model.tags,
     content: model.content,
-    category: model.category,
+    category: model.category.name,
     views: model.views,
     comments: model.comments,
     created_by: model.created_by,

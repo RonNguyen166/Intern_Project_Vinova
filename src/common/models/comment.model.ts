@@ -16,7 +16,7 @@ const CommentSchema = new Schema<IComment>(
     },
     user_id: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
+      ref: "Users",
     },
     post_id: { type: mongoose.Schema.Types.ObjectId, ref: "Posts" },
     parent_id: [
@@ -33,7 +33,8 @@ const CommentSchema = new Schema<IComment>(
 );
 
 CommentSchema.pre(/^find/, function (next) {
-  this.populate("parent_id");
+  this.populate("parent_id", "-isDelete -__v");
+  this.populate("user_id", "fullName email photo");
   next();
 });
 
