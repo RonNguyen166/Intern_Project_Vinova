@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 
 export interface ITransaction {
-  user_id: mongoose.Types.ObjectId;
+  user: mongoose.Types.ObjectId;
   type: string;
   tag?: [mongoose.Types.ObjectId];
   subject: string;
@@ -12,7 +12,7 @@ export interface ITransaction {
 
 const schema = new mongoose.Schema<ITransaction>(
   {
-    user_id: { type: mongoose.Schema.Types.ObjectId, ref: "Users" },
+    user: { type: mongoose.Schema.Types.ObjectId, ref: "Users" },
     type: {
       type: String,
       values: ["Give Pt", "Receive Pt", "Redemption"],

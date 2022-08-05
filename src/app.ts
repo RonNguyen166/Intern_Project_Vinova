@@ -1,5 +1,6 @@
 import express, { Application, NextFunction, Request, Response } from "express";
 import mongoose, { ConnectOptions } from "mongoose";
+import CronExec from "./../src/common/services/cron-point";
 import CombineRoute from "./modules/index";
 import "dotenv/config";
 import config from "./config/config";
@@ -26,7 +27,8 @@ mongoose
       next(new AppError(ErrorResponsesCode.NOT_FOUND, ErrorMessages.NOT_FOUND));
     }
     );
-
+    
+    const cronExec = new CronExec();
     app.use(errorConverter);
     app.use(errorHandler);
     app.listen(port, () =>
