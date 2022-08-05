@@ -25,23 +25,6 @@ export default class CommentController {
     return successReponse(req, res, resultData, "Create Successfully", 201);
   });
 
-  public createCommentReply = catchAsync(
-    async (req: Request, res: Response) => {
-      const data: ICommentCreate = {
-        user_id: (<any>req).authenticatedUser._id,
-        ...req.body,
-      };
-      const result = await this.commentService.createCommentReply(
-        req.params.id,
-        data
-      );
-      const resultData: object = {
-        comment: result,
-      };
-      return successReponse(req, res, resultData, "Create Successfully", 201);
-    }
-  );
-
   public getAllComments = catchAsync(async (req: Request, res: Response) => {
     const results = await this.commentService.getAllComments(req.query);
     const serializedResults = results.map((ele: any) =>
@@ -54,7 +37,11 @@ export default class CommentController {
   });
 
   public getCommentsByPost = catchAsync(async (req: Request, res: Response) => {
-    const results = await this.commentService.getCommentsByPost(req.params.id);
+    const limit: any = req.query.limit;
+    const results = await this.commentService.getCommentsByPost(
+      req.params.id,
+      limit
+    );
     const serializedResults = results.map((ele: any) =>
       serializerGetComment(ele)
     );
@@ -75,6 +62,22 @@ export default class CommentController {
     return successReponse(req, res, resultData, "Get Successfully");
   });
 
+  public createCommentReply = catchAsync(
+    async (req: Request, res: Response) => {
+      const data: ICommentCreate = {
+        user_id: (<any>req).authenticatedUser._id,
+        ...req.body,
+      };
+      const result = await this.commentService.createCommentReply(
+        req.params.id,
+        data
+      );
+      const resultData: object = {
+        comment: result,
+      };
+      return successReponse(req, res, resultData, "Create Successfully", 201);
+    }
+  );
   public getComment = catchAsync(async (req: Request, res: Response) => {
     const filter: object = {
       _id: req.params.id,
@@ -88,12 +91,13 @@ export default class CommentController {
   });
 
   public updateComment = catchAsync(async (req: Request, res: Response) => {
-    const filter: object = {
-      _id: req.params.id,
-      isDelete: false,
-    };
     const dataBody: ICommentUpdate = { ...req.body };
-    const result = await this.commentService.updateComment(filter, dataBody);
+
+    const result = await this.commentService.updateComment(
+      (<any>req).authenticatedUser,
+      req.params,
+      dataBody
+    );
     const resultData: object = {
       comment: serializerGetComment(result),
     };
@@ -105,6 +109,6 @@ export default class CommentController {
       (<any>req).authenticatedUser,
       req.params
     );
-    return successReponse(req, res, { isDelete: true }, "Updated Succesfully");
+    return successReponse(req, res, { isDelete: true }, "Deleted Succesfully");
   });
 }

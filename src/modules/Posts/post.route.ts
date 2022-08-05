@@ -25,15 +25,18 @@ export default class PostRoute {
       .route("/filter")
       .get(validate(getFilter), this.postController.getFilterPosts);
     this.router.get("/my-posts", isAuthen, this.postController.getMyPosts);
+
+    this.router.get("/:id/comments", this.commentController.getCommentsByPost);
+
     this.router
       .route("/:id")
       .get(this.postController.getPost)
       .patch(isAuthen, validate(updateOne), this.postController.updatePost)
       .delete(isAuthen, validate(deleteOne), this.postController.deletePost);
 
-    this.router
-      .route("/:postId/comments")
-      .get(this.commentController.getComment);
+    // this.router
+    //   .route("/:postId/comments")
+    //   .get(this.commentController.getComment);
 
     this.router.post(
       "/comments",
@@ -41,10 +44,10 @@ export default class PostRoute {
       this.commentController.createComment
     );
 
-    this.router.get("/:id/comments", this.commentController.getCommentsByPost);
     this.router
       .route("/:postId/comments/:commentId")
       .get(this.commentController.getCommentByPost)
+      .patch(isAuthen, this.commentController.updateComment)
       .delete(isAuthen, this.commentController.deleteComment);
   }
 }

@@ -6,9 +6,6 @@ export interface ICommentCreate {
 
 export interface ICommentUpdate {
   content: string;
-  user_id: string;
-  post_id: string;
-  parent_id: string;
 }
 export interface ICommentGet {
   content: string;
