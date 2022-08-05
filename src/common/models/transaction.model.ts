@@ -1,9 +1,9 @@
 import mongoose from "mongoose";
 
 export interface ITransaction {
-  user_id: mongoose.Types.ObjectId;
+  user: mongoose.Types.ObjectId;
   type: string;
-  tag?: [mongoose.Types.ObjectId];
+  tag: [mongoose.Types.ObjectId];
   subject: string;
   point: number;
   createdAt: Date;
@@ -12,13 +12,13 @@ export interface ITransaction {
 
 const schema = new mongoose.Schema<ITransaction>(
   {
-    user_id: { type: mongoose.Schema.Types.ObjectId, ref: "Users" },
+    user: { type: mongoose.Schema.Types.ObjectId, ref: "Users" },
     type: {
       type: String,
       values: ["Give Pt", "Receive Pt", "Redemption"],
       required: [true, "A transaction must have a type"],
     },
-    tag: [{ type: mongoose.Types.ObjectId, ref: "Tag" }],
+    tag: [{ type: mongoose.Types.ObjectId, ref: "Tags" }],
     subject: {
       type: String,
       required: [true, "A transaction must have a subject"],

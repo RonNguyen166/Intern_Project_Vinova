@@ -51,6 +51,7 @@ router
   .post(isAuthen, validate(create), transactionController.createTransaction);
 router.route("/top/receivers").get(transactionController.getTopReceivers);
 router.route("/top/givers").get(transactionController.getTopGivers);
+router.route("/all").get(transactionController.getAllTransactions)
 router
   .route("/:id")
   .get(isAuthen, transactionController.getTransaction);

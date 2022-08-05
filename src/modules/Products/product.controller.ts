@@ -1,10 +1,11 @@
 import express from "express";
 import ProductService from "./product.services";
 import ApiFeature from "../../utils/apiFeatures";
+import {s3Upload, s3GetUpload, s3DeleteUpload} from "../../common/services/upload2.service";
 
 export default class ProductController {
   private productService: ProductService = new ProductService();
-
+  //public s3Upload: S3Upload = new S3Upload(); 
   public getAllProduct = async <ProductController>(
     req: express.Request,
     res: express.Response,
@@ -33,12 +34,17 @@ export default class ProductController {
     next: express.NextFunction
   ) => {
     try {
-      const product = await this.productService.getProduct(req.params.id);
+      const product: any = await this.productService.getProduct(req.params.id);
+      const photoURL = await s3GetUpload(product.photo);
+      //console.log(product.photoURL);
+
+
       return res.status(200).json({
         status: "success",
-        data: {
+        data:{
           product,
-        },
+          url: photoURL
+        }
       });
     } catch (err) {
       return res.status(400).json({
@@ -54,11 +60,18 @@ export default class ProductController {
     next: express.NextFunction
   ) => {
     try {
-      let bodyObj: any = { ...req.body };
       if (!req.authenticatedUser) {
         throw "Please login to get access";
       }
-      bodyObj.user_id = req.authenticatedUser._conditions._id;
+      console.log(req.body);
+      if(req.file){
+        const url = await s3Upload(req.file);
+        req.body.photo = url;
+      }
+      let bodyObj: any = { ...req.body }; 
+      console.log(bodyObj);     
+      bodyObj.user_id = req.authenticatedUser._id;
+
       const product = await this.productService.createProduct(bodyObj);
       return res.status(201).json({
         status: "success",
@@ -67,6 +80,7 @@ export default class ProductController {
         },
       });
     } catch (err) {
+      console.log(err);
       return res.status(400).json({
         status: "error",
         message: "Cannot create product",

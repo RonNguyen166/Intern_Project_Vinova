@@ -1,10 +1,11 @@
 import mongoose from "mongoose";
+import { stringify } from "uuid";
 export interface IProduct {
   title: string;
   description: string;
   quantity: number;
   price: number;
-  images: string[];
+  photo: string;
   user_id: mongoose.Schema.Types.ObjectId;
   branch_id: mongoose.Schema.Types.ObjectId;
   status: boolean;
@@ -29,8 +30,8 @@ const schema: mongoose.Schema = new mongoose.Schema<IProduct>(
       type: Number,
       required: [true, "A product must have a price"],
     },
-    images: {
-      type: [String],
+    photo: {
+      type: String,
     },
     user_id: { type: mongoose.Schema.Types.ObjectId, ref: "Users" },
     branch_id: { type: mongoose.Schema.Types.ObjectId, ref: "Branch" },

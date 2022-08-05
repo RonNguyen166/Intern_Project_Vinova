@@ -9,7 +9,7 @@ export default class TransactionService {
   public async getAllTransactions() {
     try {
       const transactions = await Transaction.find()
-        .populate("user_id", "-password -createdAt -updatedAt -__v")
+        .populate("user", "alias name")
         .populate("tag", "-createdAt -updatedAt -__v");
       return transactions;
     } catch (err) {
@@ -19,7 +19,7 @@ export default class TransactionService {
   public async getTransaction(id: string) {
     try {
       const transaction = await Transaction.findById(id)
-        .populate("user_id", "-password -createdAt -updatedAt -__v")
+        .populate("user", "alias name")
         .populate("tag", "-createdAt -updatedAt -__v");
 
       return transaction;
@@ -37,8 +37,8 @@ export default class TransactionService {
   }
   public async getTransactionByUserId(userid: string) {
     try {
-      const transaction = await Transaction.find({ user_id: userid })
-        .populate("user_id", "-password -createdAt -updatedAt -__v")
+      const transaction = await Transaction.find({ user: userid })
+        .populate("user", "alias name")
         .populate("tag", "-createdAt -updatedAt -__v");
       return transaction;
     } catch (err) {
@@ -47,7 +47,7 @@ export default class TransactionService {
   }
   public async getTopReceivers() {
     try {
-      console.log("getTopReceivers");
+      //console.log("getTopReceivers");
       const topReceivers = await Transaction.aggregate([
         {
           $match: {
@@ -56,8 +56,8 @@ export default class TransactionService {
         },
         {
           $group: {
-            _id: "$user_id",
-            count: { $sum: "$point" },
+            _id: "$user",
+            pointreceive: { $sum: "$point" },
           },
         },
         {
@@ -69,8 +69,8 @@ export default class TransactionService {
             pipeline: [
               {
                 $project: {
-                  name: 1,
-                  email: 1,
+                  fullName: 1,
+                  alias: 1,
                 },
               },
             ],
@@ -98,8 +98,8 @@ export default class TransactionService {
         },
         {
           $group: {
-            _id: "$user_id",
-            count: { $sum: "$point" },
+            _id: "$user",
+            pointgive: { $sum: "$point" },
           },
         },
         {
@@ -111,8 +111,8 @@ export default class TransactionService {
             pipeline: [
               {
                 $project: {
-                  name: 1,
-                  email: 1,
+                  fullName: 1,
+                  alias: 1,
                 },
               },
             ],
@@ -126,7 +126,7 @@ export default class TransactionService {
         },
       ]);
       for (let i = 0; i < topGivers.length; i++) {
-        topGivers[i].count = -topGivers[i].count;
+        topGivers[i].pointgive = -topGivers[i].pointgive;
         //topGivers[i].user.password = null;
       }
       return topGivers;
