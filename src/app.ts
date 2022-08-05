@@ -1,6 +1,6 @@
 import express, { Application, NextFunction, Request, Response } from "express";
 import mongoose, { ConnectOptions } from "mongoose";
-import CronExec from "./../src/common/services/cron-point";
+import CronExec from "./common/services/cron-point.service";
 import CombineRoute from "./modules/index";
 import "dotenv/config";
 import config from "./config/config";

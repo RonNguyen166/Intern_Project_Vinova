@@ -112,7 +112,7 @@ export default class TransactionController {
   ) => {
     try {
       const postBody = req.body?.post;
-      console.log(req.body);
+      //console.log(req.body);
       const transactionObj: any = {};
       transactionObj.subject = postBody;
       if (!req.authenticatedUser) {
@@ -123,7 +123,7 @@ export default class TransactionController {
       if(fromUser == null){
         throw "Invalid user!";
       }
-      transactionObj.user_id = req.authenticatedUser._id;
+      transactionObj.user = req.authenticatedUser._id;
       let postToken = postBody.split(" ");
       
       
@@ -136,6 +136,7 @@ export default class TransactionController {
       for (let i = 1; i < postToken.length; i++) {
         if (postToken[i].startsWith("@")) {
           toUsersArray.push(postToken[i].replace("@", ""));
+          //console.log(postToken[i]);
         }
         if (postToken[i].startsWith("#")) {
           tagStrings.push(postToken[i]);
@@ -171,7 +172,7 @@ export default class TransactionController {
                 name: tagString,
                 amount: 1,
               });
-              console.log(tagIds);
+              //console.log(tagIds);
               tagIds.push(tag._id);
             } catch (err) {
               throw err;
@@ -187,9 +188,9 @@ export default class TransactionController {
           }
         })
       );
-      console.log(tagIds);
+      //console.log(tagIds);
       transactionObj.tag = tagIds;
-      console.log(transactionObj.tag);
+      //console.log(transactionObj.tag);
 
       /* Check if received user exists */
       let toUsersIdArray = [];
@@ -232,10 +233,11 @@ export default class TransactionController {
       
       for (let i = 0; i < toUsersArray.length; i++) {
         transDetailsObj.user_id_to = await Users.findOne({
-          name: toUsersArray[i],
+          alias: toUsersArray[i],
         });
+        //console.log(transDetailsObj.user_id_to);
         transDetailsObj.user_id_to = transDetailsObj.user_id_to._id;
-        transactionReceived.user_id = transDetailsObj.user_id_to;
+        transactionReceived.user = transDetailsObj.user_id_to;
         await this.transactionService.createTransaction(transactionReceived);
         toUsersArray[i] = transDetailsObj.user_id_to;
       }
@@ -287,7 +289,7 @@ export default class TransactionController {
     next: express.NextFunction
   ) => {
     try {
-      console.log("get top receivers");
+      //console.log("get top receivers");
       const topGivers = await this.transactionService.getTopGivers();
       return res.status(200).json({
         status: "success",

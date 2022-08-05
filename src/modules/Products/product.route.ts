@@ -2,6 +2,7 @@ import express from "express";
 import {isAuthen, isAuthor} from "../../middlewares/authen.middleware";
 import ProductController from "./product.controller";
 import RedemptionController from "../Redemptions/redemption.controller";
+import {upload} from "../../common/services/upload2.service";
 
 const productController = new ProductController();
 const redemptionController = new RedemptionController();
@@ -13,7 +14,7 @@ POST method for testing purposes only
 router
   .route("/")
   .get(productController.getAllProduct)
-  .post(isAuthen, productController.createProduct);
+  .post(isAuthen, upload.single("photo"), productController.createProduct);
 
 /*
 UPDATE method for testing purposes only

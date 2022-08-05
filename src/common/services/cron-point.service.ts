@@ -1,6 +1,6 @@
 import cron from 'node-cron';
-import Users from "./../../common/models/user.model";
-import UserService from "./../../modules/User/user.services";
+import Users from "../models/user.model";
+import UserService from "../../modules/User/user.services";
 
 const userService = new UserService(Users);
 // const cronExec = cron.schedule('0 0 1 */1 *', () => {
@@ -15,10 +15,13 @@ export default class CronExec{
                 const users = await userService.getAllUsers();
                 for(let i = 0; i < users.length; i++){
                     if(users[i].point){
-                        if(users[i].role === "member"){
-                            //console.log(users[i].point.givePoint);
+                        if(users[i].role === "member")
+                        {   
+                            console.log("i: " + i);
+                            console.log(users[i].point.givePoint);
                             users[i].point.givePoint += 50;
-                            //console.log(users[i].point.givePoint);
+                            console.log(users[i].point.givePoint);
+                            console.log("-------------------");
                         }
                         else if(users[i].role === "vice lead"){
                             users[i].point.givePoint += 100; 
