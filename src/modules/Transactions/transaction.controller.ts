@@ -4,8 +4,7 @@ import TransactionService from "./transaction.services";
 import TransactionDetailService from "../TransactionDetails/transactiondetail.services";
 import UserService from "./../../modules/User/user.services";
 
-
-import { Tag, ITag } from "../../common/models/tag.model";
+import Tag from "../../common/models/tag.model"
 import Users from "../../common/models/user.model";
 export default class TransactionController {
   private transactionService: TransactionService = new TransactionService();
