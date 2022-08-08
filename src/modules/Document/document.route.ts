@@ -1,10 +1,16 @@
-import express, { Application, RequestHandler, Router } from "express";
-import { isAuthen, isAuthor } from "../../middlewares/authen.middleware";
+import { Router } from "express";
 import validate from "../../middlewares/validate.middleware";
-import { create, getAll, getOne, updateOne, deleteOne } from "./document.schema";
+import { 
+  create, 
+  getAll, 
+  getOne, 
+  updateOne, 
+  deleteOne 
+} from "./document.schema";
 import DocumentController from "./document.controller";
+import { isAuthen, isAuthor } from "../../middlewares/authen.middleware";
+import { upload } from "../../common/services/upload2.service";
 export default class DocumentRoute {
-  public path: string = "/documents";
   public router: Router = Router();
   private documentController = new DocumentController();
   constructor() {
@@ -12,7 +18,7 @@ export default class DocumentRoute {
   }
   public intializeRoute(): void {
     this.router
-      .route(`${this.path}/:id`)
+      .route(`/:id`)
       .get( 
         validate(getOne), 
         this.documentController.getDocument)
@@ -20,6 +26,8 @@ export default class DocumentRoute {
         isAuthen, 
         isAuthor, 
         validate(updateOne), 
+        upload.single("image"),
+        upload.single("link"),
         this.documentController.updateDocument)
       .delete(
         isAuthen, 
@@ -27,13 +35,15 @@ export default class DocumentRoute {
         validate(deleteOne), 
       this.documentController.deleteDocument)
     this.router
-      .route(`${this.path}/`)
+      .route(`/`)
       .get( 
         validate(getAll), 
         this.documentController.getAllDocuments)
       .post(
         isAuthen, 
         isAuthor, 
+        upload.single("image"),
+        upload.single("link"),
         validate(create), 
       this.documentController.createDocument);
   }

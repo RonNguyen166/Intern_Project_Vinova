@@ -1,6 +1,5 @@
 import Joi, { ObjectSchema } from "joi";
 import { objectId } from "../../common/validation/custom.vaidation";
-// import { Roles } from "../../utils/constants";
 
 const create = Joi.object({
   body: Joi.object().keys({

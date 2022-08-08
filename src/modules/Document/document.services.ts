@@ -1,7 +1,8 @@
-import mongoose, { Model } from "mongoose";
-import Document, { IDocument } from "../../common/models/document.model";
+import { Model } from "mongoose";
+import { IDocument } from "../../common/models/document.model";
 import { BaseRepository } from "../../common/repository/base.repository";
 import AppError from "../../utils/appError";
+import { ErrorResponsesCode } from "../../utils/constants";
 export default class DocumentService extends BaseRepository<IDocument> {
   constructor(public readonly documentRepository: Model<IDocument>) {
     super(documentRepository);
@@ -10,7 +11,7 @@ export default class DocumentService extends BaseRepository<IDocument> {
     try {
       const documents = await this.getAll();
       if (!documents) {
-        throw new AppError(404, "Document not Exist");
+        throw new AppError(ErrorResponsesCode.NOT_FOUND, "Document not Exist");
       }
       return documents
     } catch (err) {
@@ -22,7 +23,7 @@ export default class DocumentService extends BaseRepository<IDocument> {
     try {
       const document = await this.getOne({ _id: documentId });
       if (!document) {
-        throw new AppError(404, "Document not Exist");
+        throw new AppError(ErrorResponsesCode.NOT_FOUND, "Document not Exist");
       }
       return document;
     } catch (err) {
@@ -43,7 +44,7 @@ export default class DocumentService extends BaseRepository<IDocument> {
     try {
       const document = await this.update({ _id: documentId }, data);
       if (!document) {
-        throw new AppError(404, "Documents not Exist");
+        throw new AppError(ErrorResponsesCode.NOT_FOUND, "Documents not Exist");
       }
       return document;
     } catch (err) {
@@ -54,7 +55,7 @@ export default class DocumentService extends BaseRepository<IDocument> {
     try {
       const document = await this.delete({ _id: documentId });
       if (!document) {
-        throw new AppError(404, "Document not Exist");
+        throw new AppError(ErrorResponsesCode.NOT_FOUND, "Document not Exist");
       }
       return document;
     } catch (err) {
