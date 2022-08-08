@@ -9,8 +9,8 @@ export default class ProductService {
         .paginate();
 
       const products = await apiFeature.query.populate(
-        "user_id",
-        "-password -createdAt -updatedAt -__v"
+        "user",
+        "fullName alias"
       );
       return products;
     } catch (err) {
@@ -20,8 +20,8 @@ export default class ProductService {
   public async getProduct(id: string) {
     try {
       const product = await Product.findById(id).populate(
-        "user_id",
-        "-password -createdAt -updatedAt -__v"
+        "user",
+        "fullName alias"
       );
       return product;
     } catch (err) {

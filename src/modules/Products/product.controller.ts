@@ -63,14 +63,14 @@ export default class ProductController {
       if (!req.authenticatedUser) {
         throw "Please login to get access";
       }
-      console.log(req.body);
+      //console.log(req.body);
       if(req.file){
         const url = await s3Upload(req.file);
         req.body.photo = url;
       }
       let bodyObj: any = { ...req.body }; 
-      console.log(bodyObj);     
-      bodyObj.user_id = req.authenticatedUser._id;
+      //console.log(bodyObj);     
+      bodyObj.user = req.authenticatedUser._id;
 
       const product = await this.productService.createProduct(bodyObj);
       return res.status(201).json({
@@ -80,7 +80,7 @@ export default class ProductController {
         },
       });
     } catch (err) {
-      console.log(err);
+      //console.log(err);
       return res.status(400).json({
         status: "error",
         message: "Cannot create product",
