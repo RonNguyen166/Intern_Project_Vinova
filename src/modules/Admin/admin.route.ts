@@ -17,7 +17,7 @@ export default class AdminRoute {
   public router: Router = Router();
   public userController = new UserController();
   // public productController = new ProductController();
-  // public postController = new PostController();
+  public postController = new PostController();
   // public categoryController = new CategoryController();
   // public documentController = new DocumentController();
   // public redeemptionController = new RedeemptionController();
@@ -45,7 +45,7 @@ export default class AdminRoute {
         validate(userValidation.deleteOne),
         this.userController.createUser
       );
-
+    this.router.route("/posts").get();
     // this.router
     //   .route("/products")
     //   .get(this.productController.getAllProduct)

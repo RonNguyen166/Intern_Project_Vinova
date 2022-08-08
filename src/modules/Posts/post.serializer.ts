@@ -7,6 +7,7 @@ export interface IResponsePost {
   category: object;
   views: number;
   comments: object[];
+  favorites: object[];
   created_by: string;
   updated_by: string;
   created_at: Date;
@@ -22,6 +23,7 @@ export interface IResultPost {
   category: string;
   views: number;
   comments: object[];
+  favorites: object[];
   created_at: Date;
   updated_at: Date;
 }
@@ -36,6 +38,7 @@ export function serializerGetPost(model: any): IResultPost {
     category: model.category.name,
     views: model.views,
     comments: model.comments,
+    favorites: model.favorites,
     created_at: model.created_at,
     updated_at: model.updated_at,
   };
@@ -51,6 +54,7 @@ export function serializerPost(model: any): IResponsePost {
     category: model.category.name,
     views: model.views,
     comments: model.comments,
+    favorites: model.favorites,
     created_by: model.created_by,
     updated_by: model.updated_by,
     created_at: model.created_at,

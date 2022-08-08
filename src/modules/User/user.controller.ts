@@ -15,6 +15,7 @@ import S3Upload from "../../common/services/upload.service";
 export default class UserController {
   public userService: UserService = new UserService(User);
   public s3Upload: S3Upload = new S3Upload();
+
   public createUser = catchAsync(async (req: Request, res: Response) => {
     if (req.file) {
       const url = await this.s3Upload.put(req.file);

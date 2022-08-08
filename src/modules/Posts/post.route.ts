@@ -42,7 +42,7 @@ export default class PostRoute {
 
     this.router
       .route("/:id")
-      .get(validate(postValidation.getOne), this.postController.getPost)
+      .get(validate(postValidation.paramId), this.postController.getPost)
       .patch(
         isAuthen,
         validate(postValidation.updateOne),
@@ -50,7 +50,7 @@ export default class PostRoute {
       )
       .delete(
         isAuthen,
-        validate(postValidation.deleteOne),
+        validate(postValidation.paramId),
         this.postController.deletePost
       );
 
@@ -69,5 +69,17 @@ export default class PostRoute {
       )
       .patch(isAuthen, this.commentController.updateComment)
       .delete(isAuthen, this.commentController.deleteComment);
+
+    this.router.patch(
+      "/:id/to-view",
+      validate(postValidation.paramId),
+      this.postController.toView
+    );
+    this.router.patch(
+      "/:id/to-favorite",
+      isAuthen,
+      validate(postValidation.paramId),
+      this.postController.toFavorite
+    );
   }
 }

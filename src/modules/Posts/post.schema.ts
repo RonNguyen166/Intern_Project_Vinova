@@ -22,24 +22,12 @@ const getFilter = Joi.object({
   }),
 });
 
-const getOne = Joi.object({
-  params: Joi.object().keys({
-    id: Joi.string().custom(objectId),
-  }),
-});
-
 const getComments = Joi.object({
   params: Joi.object().keys({
     id: Joi.string().custom(objectId),
   }),
   query: Joi.object().keys({
     limit: Joi.number(),
-  }),
-});
-
-const deleteOne = Joi.object({
-  params: Joi.object().keys({
-    id: Joi.string().custom(objectId),
   }),
 });
 
@@ -55,4 +43,10 @@ const updateOne = Joi.object({
   }),
 });
 
-export { create, getOne, updateOne, deleteOne, getFilter, getComments };
+const paramId = Joi.object({
+  params: Joi.object().keys({
+    id: Joi.required().custom(objectId),
+  }),
+});
+
+export { create, updateOne, getFilter, getComments, paramId };
