@@ -1,4 +1,4 @@
-import express, { Application, RequestHandler, Router } from "express";
+import { Router } from "express";
 import { isAuthen, isAuthor } from "../../middlewares/authen.middleware";
 import validate from "../../middlewares/validate.middleware";
 import { create, getAll, getOne, updateOne, deleteOne } from "./comment.schema";
@@ -13,6 +13,7 @@ export default class DocumentRoute {
     this.router.post(
       "/reply",
       isAuthen,
+      validate(create),
       this.commentController.createCommentReply
     );
     this.router.post(

@@ -1,9 +1,9 @@
-import express, { Application, RequestHandler, Router } from "express";
+import { Router } from "express";
+import { isAuthen, isAuthor } from "../../middlewares/authen.middleware";
 import validate from "../../middlewares/validate.middleware";
 import { create, getAll, getOne, updateOne, deleteOne } from "./branch.schema";
 import BranchController from "./branch.controller";
 export default class BranchRoute {
-  public path: string = "/branches";
   public router: Router = Router();
   private branchController = new BranchController();
   constructor() {
@@ -11,13 +11,31 @@ export default class BranchRoute {
   }
   public intializeRoute(): void {
     this.router
-      .route(`${this.path}/:id`)
-      .get(validate(getOne), this.branchController.getBranch)
-      .patch(validate(updateOne), this.branchController.updateBranch)
-      .delete(validate(deleteOne), this.branchController.deleteBranch)
+      .route("/:id")
+      .get(
+        isAuthen, 
+        validate(getOne), 
+        this.branchController.getBranch)
+      .patch(
+        isAuthen, 
+        isAuthor, 
+        validate(updateOne), 
+        this.branchController.updateBranch)
+      .delete(
+        isAuthen, 
+        isAuthor, 
+        validate(deleteOne), 
+      this.branchController.deleteBranch)
     this.router
-      .route(`${this.path}/`)
-      .get(validate(getAll), this.branchController.getAllBranchs)
-      .post(validate(create), this.branchController.createBranch);
+      .route("/")
+      .get(
+        isAuthen, 
+        validate(getAll), 
+      this.branchController.getAllBranchs)
+      .post(
+        isAuthen, 
+        isAuthor, 
+        validate(create), 
+      this.branchController.createBranch);
   }
 }

@@ -1,10 +1,9 @@
-import express, { Application, RequestHandler, Router } from "express";
+import { Router } from "express";
 import { isAuthen, isAuthor } from "../../middlewares/authen.middleware";
 import validate from "../../middlewares/validate.middleware";
 import { create, getAll, getOne, updateOne, deleteOne } from "./category.schema";
 import CategoryController from "./category.controller";
 export default class DocumentRoute {
-  public path: string = "/categories";
   public router: Router = Router();
   private categoryController = new CategoryController();
   constructor() {
@@ -12,7 +11,7 @@ export default class DocumentRoute {
   }
   public intializeRoute(): void {
     this.router
-      .route(`${this.path}/:id`)
+      .route(`/:id`)
       .get(
         isAuthen, 
         validate(getOne), 
@@ -29,7 +28,7 @@ export default class DocumentRoute {
         this.categoryController.deleteCategory)
 
     this.router
-      .route(`${this.path}/`)
+      .route(`/`)
       .get(
         isAuthen, 
         validate(getAll), 

@@ -1,5 +1,3 @@
-import { Roles } from "../../utils/constants";
-
 export interface IResponseDocument {
   _id: string;
   image:string;
@@ -13,8 +11,10 @@ export interface IResponseDocument {
 export interface IResultDocument {
   _id: string;
   image:string;
+  imageUrl: string;
   title: string;
   link: string;
+  linkUrl: string;
 }
 
 export function serializerDocument(model: any): IResponseDocument {
@@ -34,7 +34,9 @@ export function serializerGetDocument(model: any): IResultDocument {
   return {
     _id: model._id,
     image: model.image,
+    imageUrl: model.imageUrl,
     title: model.title,
     link: model.link,
+    linkUrl: model.linkUrl,
   };
 }

@@ -1,18 +1,17 @@
 import Joi, { ObjectSchema } from "joi";
-// import { Roles } from "../../utils/constants";
 
 const create = Joi.object({
   body: Joi.object().keys({
-    image: Joi.string().required(),
+    image: Joi.any().required(),
     title: Joi.string().required(),
-    link: Joi.link().required()
+    link: Joi.any().required()
   }),
 });
 const getAll = Joi.object({
   query: Joi.object().keys({
-    image: Joi.string(),
+    image: Joi.any(),
     title: Joi.string(),
-    link: Joi.link()
+    link: Joi.any()
   }),
 });
 
@@ -28,9 +27,9 @@ const updateOne: ObjectSchema = Joi.object({
   }),
   body: Joi.object().keys({
     body: Joi.object().keys({
-      image: Joi.string(),
+      image: Joi.any(),
       title: Joi.string(),
-      link: Joi.link()
+      link: Joi.any()
       }),
     }),
   });

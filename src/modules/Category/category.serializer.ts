@@ -1,5 +1,3 @@
-import { Roles } from "../../utils/constants";
-
 export interface IResponseCategory {
   _id: string;
   name: string;

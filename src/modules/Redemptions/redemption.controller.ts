@@ -3,9 +3,8 @@ import TransactionService from "../Transactions/transaction.services";
 import ProductService from "./../../modules/Products/product.services";
 import Users from "./../../common/models/user.model";
 import express from "express";
-import { IProduct, Product } from "./../../common/models/product.model";
-import mongoose from "mongoose";
 import UserService from "../User/user.services";
+import ProductController from "../Products/product.controller";
 
 export default class RedeemptionController {
   private redemptionService: RedemptionService = new RedemptionService();
@@ -34,6 +33,7 @@ export default class RedeemptionController {
         throw "Please provide valid quantity";
       }
 
+
       redemptionObj.quantity = req.body.quantity;
       if (
         req.authenticatedUser == undefined ||
@@ -42,14 +42,19 @@ export default class RedeemptionController {
       ) {
         throw "Please login to get access";
       }
+
       let user = await this.userService.getUser({_id: req.authenticatedUser._id});
       if(user == null){
         throw "Invalid user";
       }
   
+      if(user.point.redeemPoint < product.price * redemptionObj.quantity){
+        throw "Not enough point to redeem";
+      }
+
       product.quantity -= redemptionObj.quantity;
-      await product.save();
-      redemptionObj.user_id = req.authenticatedUser._id;
+      await this.productService.updateProduct(product._id, product);
+      redemptionObj.user = req.authenticatedUser._id;
       const redemption = await this.redemptionService.createRedemption(
         redemptionObj
       );
@@ -63,7 +68,7 @@ export default class RedeemptionController {
       await this.userService.updateUser(user._id, user);
 
       await transactionService.createTransaction({
-        user_id: req.authenticatedUser._id,
+        user: req.authenticatedUser._id,
         type: "Redemption",
         subject: transactionSubject,
         point: transactionPoint,
