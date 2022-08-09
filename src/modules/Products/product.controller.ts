@@ -19,9 +19,9 @@ export default class ProductController {
     );
       return res.status(200).json({
         status: "success",
-        length: products.length,
+        length: serializedResults.length,
         data: {
-          products,
+          serializedResults,
         },
       });
     } catch (err) {
