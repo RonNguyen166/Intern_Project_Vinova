@@ -3,7 +3,7 @@ import ApiFeature from "../../utils/apiFeatures";
 export default class ProductService {
   public async getAllProduct(queryString: object) {
     try {
-      const apiFeature = await new ApiFeature(Product.find(), queryString)
+      const apiFeature = await new ApiFeature(Product.find({status: true}), queryString)
         .filter()
         .sort()
         .paginate();

@@ -41,7 +41,7 @@ export default class ProductController {
       const product: any = await this.productService.getProduct(req.params.id);
       //const photoURL = await s3GetUpload(product.photo);
       //console.log(product.photoURL);
-
+      const serializedResults = serializerProduct(product);
 
       return res.status(200).json({
         status: "success",
