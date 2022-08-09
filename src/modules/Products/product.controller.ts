@@ -1,5 +1,6 @@
 import express from "express";
 import ProductService from "./product.services";
+import {IResultProduct, serializerProduct} from "./product.serializer";
 import ApiFeature from "../../utils/apiFeatures";
 import {s3Upload, s3GetUpload, s3DeleteUpload} from "../../common/services/upload2.service";
 
@@ -13,6 +14,9 @@ export default class ProductController {
   ) => {
     try {
       const products = await this.productService.getAllProduct(req.query);
+      const serializedResults = products.map((ele: any) =>
+      serializedResults(ele)
+    );
       return res.status(200).json({
         status: "success",
         length: products.length,
