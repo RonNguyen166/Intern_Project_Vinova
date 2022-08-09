@@ -49,7 +49,9 @@ export default class RedeemptionController {
         throw "Invalid user";
       }
   
-      if(user.point.redeemPoint < product.price * redemptionObj.quantity)
+      if(user.point.redeemPoint < product.price * redemptionObj.quantity){
+        throw "Not enough point to redeem";
+      }
 
       product.quantity -= redemptionObj.quantity;
       await product.save();
