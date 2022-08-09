@@ -1,8 +1,9 @@
 import express from "express";
 import ProductService from "./product.services";
 import {IResultProduct, serializerProduct} from "./product.serializer";
-import ApiFeature from "../../utils/apiFeatures";
 import {s3Upload, s3GetUpload, s3DeleteUpload} from "../../common/services/upload2.service";
+import { IProduct } from "../../common/models/product.model";
+import { ICreateProduct } from "./product.interface";
 
 export default class ProductController {
   private productService: ProductService = new ProductService();
@@ -11,10 +12,10 @@ export default class ProductController {
     req: express.Request,
     res: express.Response,
     next: express.NextFunction
-  ) => {
+  ): Promise<express.Response> => {
     try {
-      const products = await this.productService.getAllProduct(req.query);
-      const serializedResults = products.map((ele: any) =>
+      const products: IProduct[] = await this.productService.getAllProduct(req.query);
+      const serializedResults = products.map((ele: IProduct) =>
       serializerProduct(ele)
     );
       return res.status(200).json({
@@ -36,9 +37,12 @@ export default class ProductController {
     req: express.Request,
     res: express.Response,
     next: express.NextFunction
-  ) => {
+  ): Promise<express.Response> => {
     try {
-      const product: any = await this.productService.getProduct(req.params.id);
+      const product: IProduct = await this.productService.getProduct(req.params.id);
+      if(!product){
+        throw "Cannot get product";
+      }
       //const photoURL = await s3GetUpload(product.photo);
       //console.log(product.photoURL);
       const serializedResults = serializerProduct(product);
@@ -62,7 +66,7 @@ export default class ProductController {
     req: express.Request,
     res: express.Response,
     next: express.NextFunction
-  ) => {
+  ): Promise<express.Response> => {
     try {
       if (!req.authenticatedUser) {
         throw "Please login to get access";
@@ -72,7 +76,7 @@ export default class ProductController {
         const url = await s3Upload(req.file);
         req.body.photo = url;
       }
-      let bodyObj: any = { ...req.body }; 
+      let bodyObj: ICreateProduct = { ...req.body }; 
       //console.log(bodyObj);     
       bodyObj.user = req.authenticatedUser._id;
 
@@ -96,10 +100,10 @@ export default class ProductController {
     req: express.Request,
     res: express.Response,
     next: express.NextFunction
-  ) => {
+  ): Promise<express.Response> => {
     try {
       //console.log(req.body);
-      const product = await this.productService.updateProduct(
+      const product: IProduct = await this.productService.updateProduct(
         req.params.id,
         req.body
       );
@@ -121,15 +125,15 @@ export default class ProductController {
     req: express.Request,
     res: express.Response,
     next: express.NextFunction
-  ) => {
+  ): Promise<express.Response> => {
     try {
       this.productService.deleteProduct(req.params.id);
-      res.status(200).json({
+      return res.status(200).json({
         status: "success",
         data: null,
       });
     } catch (err) {
-      res.status(400).json({
+      return res.status(400).json({
         status: "error",
         message: "Cannot delete that product",
       });

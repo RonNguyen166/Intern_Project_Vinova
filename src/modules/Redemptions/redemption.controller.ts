@@ -4,6 +4,7 @@ import ProductService from "./../../modules/Products/product.services";
 import Users from "./../../common/models/user.model";
 import express from "express";
 import UserService from "../User/user.services";
+import ProductController from "../Products/product.controller";
 
 export default class RedeemptionController {
   private redemptionService: RedemptionService = new RedemptionService();
@@ -52,7 +53,7 @@ export default class RedeemptionController {
       }
 
       product.quantity -= redemptionObj.quantity;
-      await product.save();
+      await this.productService.updateProduct(product._id, product);
       redemptionObj.user = req.authenticatedUser._id;
       const redemption = await this.redemptionService.createRedemption(
         redemptionObj

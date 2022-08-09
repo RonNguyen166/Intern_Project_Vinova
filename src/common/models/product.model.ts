@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 import { stringify } from "uuid";
 export interface IProduct {
+  _id: string;
   title: string;
   description: string;
   quantity: number;
@@ -34,7 +35,7 @@ const schema: mongoose.Schema = new mongoose.Schema<IProduct>(
       type: String,
     },
     user: { type: mongoose.Schema.Types.ObjectId, ref: "Users" },
-    branch_id: { type: mongoose.Schema.Types.ObjectId, ref: "Branch" },
+    branch_id: { type: mongoose.Schema.Types.ObjectId, ref: "Branchs" },
     status: {
       type: mongoose.Schema.Types.Boolean,
       required: [true, "A product must have a status"],
