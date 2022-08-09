@@ -20,6 +20,7 @@ router
 UPDATE method for testing purposes only
 DELETE method for testing purposes only
 */
+router.route('/top_redeem').get(redemptionController.getTopRedeem);
 router
   .route("/:id")
   .get(productController.getProduct)
@@ -30,5 +31,4 @@ router
   .route("/:id/redeem")
   .post(isAuthen, redemptionController.createRedemption);
 
-router.route('/redemptions/top_redeem').get(redemptionController.getTopRedeem);
 export default router;

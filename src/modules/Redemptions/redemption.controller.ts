@@ -3,8 +3,6 @@ import TransactionService from "../Transactions/transaction.services";
 import ProductService from "./../../modules/Products/product.services";
 import Users from "./../../common/models/user.model";
 import express from "express";
-import { IProduct, Product } from "./../../common/models/product.model";
-import mongoose from "mongoose";
 import UserService from "../User/user.services";
 
 export default class RedeemptionController {
