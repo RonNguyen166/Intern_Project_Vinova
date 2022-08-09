@@ -31,7 +31,7 @@ export default class RedemptionService {
   }
   public async getRedemptionByUserId(userid: mongoose.Schema.Types.ObjectId) {
     try {
-      const redemptions = await Redemption.find({ user_id: userid }).populate("product_id").populate("user", "alias point");
+      const redemptions = await Redemption.find({ user: userid }).populate("product_id").populate("user", "alias point");
       return redemptions;
     } catch (err) {
       throw err;

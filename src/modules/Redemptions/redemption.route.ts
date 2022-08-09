@@ -10,9 +10,9 @@ const redemptionController: RedemptionController = new RedemptionController();
 const router = express.Router();
 
 router
-  .route("/")
+  .route("/my-redeem")
   .get(isAuthen, redemptionController.getRedemptionsByUserId);
 
-router.route("/all").get(redemptionController.getAllRedemptions);
+router.route("/").get(redemptionController.getAllRedemptions);
 
 export default router;
