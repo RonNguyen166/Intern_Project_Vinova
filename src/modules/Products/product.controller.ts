@@ -94,7 +94,7 @@ export default class ProductController {
     next: express.NextFunction
   ) => {
     try {
-      console.log(req.body);
+      //console.log(req.body);
       const product = await this.productService.updateProduct(
         req.params.id,
         req.body
