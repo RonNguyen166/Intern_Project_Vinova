@@ -55,7 +55,7 @@ export default class RedeemptionController {
 
       product.quantity -= redemptionObj.quantity;
       await product.save();
-      redemptionObj.user_id = req.authenticatedUser._id;
+      redemptionObj.user = req.authenticatedUser._id;
       const redemption = await this.redemptionService.createRedemption(
         redemptionObj
       );
