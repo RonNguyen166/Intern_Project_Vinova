@@ -34,6 +34,7 @@ export default class RedeemptionController {
         throw "Please provide valid quantity";
       }
 
+
       redemptionObj.quantity = req.body.quantity;
       if (
         req.authenticatedUser == undefined ||
@@ -42,11 +43,14 @@ export default class RedeemptionController {
       ) {
         throw "Please login to get access";
       }
+
       let user = await this.userService.getUser({_id: req.authenticatedUser._id});
       if(user == null){
         throw "Invalid user";
       }
   
+      if(user.point.redeemPoint < product.price * redemptionObj.quantity)
+
       product.quantity -= redemptionObj.quantity;
       await product.save();
       redemptionObj.user_id = req.authenticatedUser._id;
