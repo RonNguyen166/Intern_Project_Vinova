@@ -16,6 +16,7 @@
     "@aws-sdk/s3-request-presigner": "^3.142.0",
     "bcrypt": "^5.0.1",
     "cookie-parser": "^1.4.6",
+    "cors": "^2.8.5",
     "dotenv": "^16.0.1",
     "express": "^4.18.1",
     "joi": "^17.6.0",
@@ -41,7 +42,6 @@
     "@types/nodemailer": "^6.4.4",
     "@types/pug": "^2.0.6",
     "@types/uuid": "^8.3.4",
-    "cors": "^2.8.5",
     "nodemon": "^2.0.19"
   }
 }
