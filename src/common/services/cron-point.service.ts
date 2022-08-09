@@ -3,25 +3,19 @@ import Users from "../models/user.model";
 import UserService from "../../modules/User/user.services";
 
 const userService = new UserService(Users);
-// const cronExec = cron.schedule('0 0 1 */1 *', () => {
 
 
 export default class CronExec{
     constructor(){
-        cron.schedule('* * * * *',
+        cron.schedule('0 0 1 * *',
         async ()=>{
-            //console.log("CRONNED 1");
             try{       
                 const users = await userService.getAllUsers();
                 for(let i = 0; i < users.length; i++){
                     if(users[i].point){
                         if(users[i].role === "member")
                         {   
-                            //console.log("i: " + i);
-                            //console.log(users[i].point.givePoint);
                             users[i].point.givePoint += 50;
-                            //console.log(users[i].point.givePoint);
-                            //console.log("-------------------");
                         }
                         else if(users[i].role === "vice lead"){
                             users[i].point.givePoint += 100; 

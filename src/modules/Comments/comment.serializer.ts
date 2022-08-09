@@ -1,5 +1,3 @@
-import { ObjectId } from "mongoose";
-
 export interface IResponseComment {
   _id: string;
   content: string;

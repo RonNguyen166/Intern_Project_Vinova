@@ -35,9 +35,9 @@ export default class CombineRoute {
     app.use("/v1/posts", this.postRoute.router);
     app.use("/v1/users", this.userRoute.router);
     app.use("/v1/auth", this.authRoute.router);
-    app.use("/v1", this.documentRoute.router);
-    app.use("/v1", this.branchRoute.router);
-    app.use("/v1", this.categoryRoute.router);
+    app.use("/v1/documents", this.documentRoute.router);
+    app.use("/v1/branches", this.branchRoute.router);
+    app.use("/v1/categories", this.categoryRoute.router);
     app.use("/v1/admin", this.adminRoute.router);
     app.use("/v1/comments", this.commentRoute.router);
   }

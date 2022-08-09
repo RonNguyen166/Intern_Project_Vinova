@@ -1,5 +1,3 @@
-import { Roles } from "../../utils/constants";
-
 export interface IResponseBranch {
   _id: string;
   name: string;

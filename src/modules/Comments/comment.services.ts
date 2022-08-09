@@ -1,4 +1,4 @@
-import mongoose, { Model } from "mongoose";
+import { Model } from "mongoose";
 import Comment, { IComment } from "../../common/models/comment.model";
 import Post from "../../common/models/post.model";
 import { BaseRepository } from "../../common/repository/base.repository";
