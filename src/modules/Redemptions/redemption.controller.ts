@@ -69,7 +69,7 @@ export default class RedeemptionController {
       await this.userService.updateUser(user._id, user);
 
       await transactionService.createTransaction({
-        user_id: req.authenticatedUser._id,
+        user: req.authenticatedUser._id,
         type: "Redemption",
         subject: transactionSubject,
         point: transactionPoint,
