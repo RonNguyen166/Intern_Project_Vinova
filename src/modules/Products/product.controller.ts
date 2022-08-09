@@ -15,7 +15,7 @@ export default class ProductController {
     try {
       const products = await this.productService.getAllProduct(req.query);
       const serializedResults = products.map((ele: any) =>
-      serializedResults(ele)
+      serializerProduct(ele)
     );
       return res.status(200).json({
         status: "success",
@@ -39,7 +39,7 @@ export default class ProductController {
   ) => {
     try {
       const product: any = await this.productService.getProduct(req.params.id);
-      const photoURL = await s3GetUpload(product.photo);
+      //const photoURL = await s3GetUpload(product.photo);
       //console.log(product.photoURL);
 
 
@@ -47,7 +47,7 @@ export default class ProductController {
         status: "success",
         data:{
           product,
-          url: photoURL
+          //url: photoURL
         }
       });
     } catch (err) {
