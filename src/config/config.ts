@@ -1,5 +1,5 @@
 import express, { Application } from "express";
-import cookieParser from "cookie-Parser";
+import cookieParser from "cookie-parser";
 import cors from "cors";
 export default function config(app: Application) {
   app.use(cors());
