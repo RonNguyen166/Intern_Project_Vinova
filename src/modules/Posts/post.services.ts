@@ -41,7 +41,7 @@ export default class PostService extends BaseRepository<IPost> {
         .populate("category", "name")
         .populate("user_id", "fullName email photo")
         .populate("favorites", "fullName email photo")
-        .populate("comments", "content user_id parent_id")
+        .populate("comments", "content user_id parent_id reply replies")
         .exec();
       return posts;
     } catch (err) {
@@ -57,7 +57,11 @@ export default class PostService extends BaseRepository<IPost> {
         .populate("category", "name")
         .populate("user_id", "fullName email photo")
         .populate("favorites", "fullName email photo")
-        .populate("comments", "content user_id parent_id")
+        .populate({
+          path: "comments",
+          select: "-isDelete -__v",
+          options: { sort: { created_at: 1 } },
+        })
         .exec();
       return posts;
     } catch (err) {
@@ -96,7 +100,11 @@ export default class PostService extends BaseRepository<IPost> {
         .populate("category", "name")
         .populate("user_id", "fullName email photo")
         .populate("favorites", "fullName email photo")
-        .populate("comments", "content user_id parent_id")
+        .populate({
+          path: "comments",
+          select: "-isDelete -__v",
+          options: { sort: { created_at: 1 } },
+        })
         .select({ isDelete: 0 })
         .limit(_size)
         .skip(_size * (_page - 1))
@@ -123,7 +131,11 @@ export default class PostService extends BaseRepository<IPost> {
         .populate("category", "name")
         .populate("user_id", "fullName email photo")
         .populate("favorites", "fullName email photo")
-        .populate("comments", "content user_id parent_id")
+        .populate({
+          path: "comments",
+          select: "-isDelete -__v",
+          options: { sort: { created_at: 1 } },
+        })
         .select({ isDelete: 0 })
         .exec();
       if (!post) {
@@ -177,7 +189,11 @@ export default class PostService extends BaseRepository<IPost> {
         .populate("category", "name")
         .populate("user_id", "fullName email photo")
         .populate("favorites", "fullName email photo")
-        .populate("comments", "content user_id parent_id")
+        .populate({
+          path: "comments",
+          select: "-isDelete -__v",
+          options: { sort: { created_at: 1 } },
+        })
         .exec();
       return post;
     } catch (err) {

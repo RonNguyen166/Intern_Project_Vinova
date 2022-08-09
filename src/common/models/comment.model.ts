@@ -4,8 +4,9 @@ import { IBase, SchemaBase } from "./base.model";
 export interface IComment extends IBase {
   content: string;
   user_id: mongoose.Schema.Types.ObjectId;
-  post_id: mongoose.Schema.Types.ObjectId;
-  parent_id: mongoose.Schema.Types.ObjectId[];
+  parent_id: mongoose.Schema.Types.ObjectId;
+  reply: boolean;
+  replies: mongoose.Schema.Types.ObjectId[];
 }
 
 const CommentSchema = new Schema<IComment>(
@@ -18,11 +19,17 @@ const CommentSchema = new Schema<IComment>(
       type: mongoose.Schema.Types.ObjectId,
       ref: "Users",
     },
-    post_id: { type: mongoose.Schema.Types.ObjectId, ref: "Posts" },
-    parent_id: [
+    parent_id: {
+      type: mongoose.Schema.Types.ObjectId,
+      required: true,
+    },
+    reply: {
+      type: Boolean,
+      default: false,
+    },
+    replies: [
       {
         type: mongoose.Schema.Types.ObjectId,
-        required: true,
         ref: "Comments",
       },
     ],
@@ -33,7 +40,11 @@ const CommentSchema = new Schema<IComment>(
 );
 
 CommentSchema.pre(/^find/, function (next) {
-  this.populate("parent_id", "-isDelete -__v");
+  this.populate({
+    path: "replies",
+    select: "-isDelete -__v",
+    options: { sort: { created_at: 1 } },
+  });
   this.populate("user_id", "fullName email photo");
   next();
 });

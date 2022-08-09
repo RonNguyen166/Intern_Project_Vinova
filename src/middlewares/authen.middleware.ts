@@ -16,7 +16,7 @@ export const isAuthen = catchAsync(
       const user = await new UserService(User).getUser({ _id: decoded.sub });
       if (!user) throw new Error();
       (<any>req).authenticatedUser = serializerGetUser(user);
-      console.log(req.authenticatedUser);
+
       next();
     } catch (err) {
       throw new AppError(

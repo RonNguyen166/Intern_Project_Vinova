@@ -1,6 +1,6 @@
 import express, { Application, NextFunction, Request, Response } from "express";
 import mongoose, { ConnectOptions } from "mongoose";
-import CronExec from "./common/services/cron-point.service";
+// import CronExec from "./common/services/cron-point.service";
 import CombineRoute from "./modules/index";
 import "dotenv/config";
 import config from "./config/config";
@@ -25,10 +25,9 @@ mongoose
     console.log("Database connection established");
     app.use("*", function (req: Request, res: Response, next: NextFunction) {
       next(new AppError(ErrorResponsesCode.NOT_FOUND, ErrorMessages.NOT_FOUND));
-    }
-    );
-    
-    const cronExec = new CronExec();
+    });
+
+    // const cronExec = new CronExec();
     app.use(errorConverter);
     app.use(errorHandler);
     app.listen(port, () =>

@@ -62,7 +62,7 @@ export default class PostRoute {
     );
 
     this.router
-      .route("/:postId/comments/:commentId")
+      .route("/:parentId/comments/:commentId")
       .get(
         validate(commentValidation.getOne),
         this.commentController.getCommentByPost

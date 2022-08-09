@@ -4,7 +4,7 @@ import { objectId } from "../../common/validation/custom.vaidation";
 
 const create = Joi.object({
   body: Joi.object().keys({
-    post_id: Joi.required().custom(objectId),
+    parent_id: Joi.required().custom(objectId),
     content: Joi.string().required(),
   }),
 });
@@ -18,7 +18,7 @@ const getAll = Joi.object({
 
 const getOne: ObjectSchema = Joi.object({
   params: Joi.object().keys({
-    postId: Joi.required().custom(objectId),
+    parentId: Joi.required().custom(objectId),
     commentId: Joi.required().custom(objectId),
   }),
 });

@@ -11,9 +11,14 @@ export default class DocumentRoute {
   }
   public intializeRoute(): void {
     this.router.post(
-      "/:id/reply",
+      "/reply",
       isAuthen,
       this.commentController.createCommentReply
+    );
+    this.router.post(
+      "/:parentId/reply/:replyId",
+      isAuthen,
+      this.commentController.updateReply
     );
     this.router
       .route("/:id")

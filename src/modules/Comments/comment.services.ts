@@ -38,18 +38,18 @@ export default class CommentService extends BaseRepository<IComment> {
       throw err;
     }
   }
-  async getCommentsByPost(postId: string, limit: any): Promise<any> {
-    const comments = await Comment.find({ post_id: postId })
+  async getCommentsByPost(parentId: string, limit: any): Promise<any> {
+    const comments = await Comment.find({ parent_id: parentId })
       .limit(parseInt(limit) || 0)
       .exec();
     return comments;
   }
 
   async getCommentByPost(params: any): Promise<any> {
-    const { postId, commentId } = params;
+    const { parentId, commentId } = params;
     const comment = await Comment.findOne({
-      post_id: postId,
-      comment_id: commentId,
+      parent_id: parentId,
+      _id: commentId,
     })
       .populate("user_id", "fullName email photo")
       .exec();
@@ -63,7 +63,7 @@ export default class CommentService extends BaseRepository<IComment> {
   }
   async createComment(data: any): Promise<any> {
     try {
-      const post = await Post.findById(data.post_id);
+      const post = await Post.findById(data.parent_id);
       if (post) {
         const comment = await this.create(data);
         post.comments.push(comment.id);
@@ -78,13 +78,21 @@ export default class CommentService extends BaseRepository<IComment> {
       throw err;
     }
   }
-  async createCommentReply(commentId: string, data: any): Promise<any> {
+  async createCommentReply(data: any): Promise<any> {
     try {
-      const comment = await this.getOne({ _id: commentId });
-      if (comment.post_id) {
+      const { parent_id } = data;
+      const comment = await this.getOne({ _id: parent_id });
+      if (!comment.reply) {
         const reply = await this.create(data);
-        comment.parent_id.push(reply.id);
-        return await comment.save();
+        comment.replies.push(reply.id);
+        reply.reply = true;
+        await comment.save();
+        return await reply.save();
+      } else {
+        throw new AppError(
+          ErrorResponsesCode.BAD_REQUEST,
+          ErrorMessages.BAD_REQUEST
+        );
       }
     } catch (err) {
       throw err;
@@ -92,10 +100,10 @@ export default class CommentService extends BaseRepository<IComment> {
   }
   async updateComment(user: any, params: any, data: any) {
     try {
-      const { postId, commentId } = params;
+      const { parentId, commentId } = params;
       const comment = await Comment.findOne({
         _id: commentId,
-        post_id: postId,
+        parent_id: parentId,
       });
       if (!comment) {
         throw new AppError(
@@ -118,10 +126,43 @@ export default class CommentService extends BaseRepository<IComment> {
       throw err;
     }
   }
+
+  async updateReply(user: any, params: any, data: any): Promise<any> {
+    try {
+      const { commentId, replyId } = params;
+      const comment = await Comment.findOne({
+        _id: replyId,
+        parent_id: commentId,
+      });
+      if (!comment) {
+        throw new AppError(
+          ErrorResponsesCode.BAD_REQUEST,
+          ErrorMessages.BAD_REQUEST
+        );
+      }
+
+      const isAccess = (<any>comment).user_id.equals(user._id) || user.isAdmin;
+      if (isAccess) {
+        comment.content = data.content;
+        comment.save();
+      } else {
+        throw new AppError(
+          ErrorResponsesCode.BAD_REQUEST,
+          "You do not have permission to perform this feature."
+        );
+      }
+      return comment;
+    } catch (err) {
+      throw err;
+    }
+  }
   async deleteComment(user: any, params: any) {
     try {
-      const { postId, commentId } = params;
-      const comment = await this.getOne({ _id: commentId, post_id: postId });
+      const { parentId, commentId } = params;
+      const comment = await this.getOne({
+        _id: commentId,
+        parent_id: parentId,
+      });
       if (!comment) {
         throw new AppError(
           ErrorResponsesCode.BAD_REQUEST,
@@ -130,9 +171,14 @@ export default class CommentService extends BaseRepository<IComment> {
       }
       const isAccess = (<any>comment).user_id.equals(user._id) || user.isAdmin;
       if (isAccess) {
-        await Post.findByIdAndUpdate(comment.post_id, {
+        await Post.findByIdAndUpdate(comment.parent_id, {
           $pull: { comments: comment.id },
         });
+        await Promise.all(
+          comment.replies.map(async (reply: any) => {
+            await Comment.findByIdAndDelete(reply);
+          })
+        );
         await comment.remove();
       } else {
         throw new AppError(
@@ -145,19 +191,18 @@ export default class CommentService extends BaseRepository<IComment> {
     }
   }
 
-  
-  async getCommentsByPostId(postId: string, queryString: object): Promise<any> {
-    try {
-      const apiFeatures = new ApiFeatures(
-        Comment.find({ postId: postId }),
-        queryString
-      )
-        .filter()
-        .sort()
-        .paginate();
-      return apiFeatures;
-    } catch (err) {
-      throw err;
-    }
-  }
+  // async getCommentsByPostId(postId: string, queryString: object): Promise<any> {
+  //   try {
+  //     const apiFeatures = new ApiFeatures(
+  //       Comment.find({ postId: postId }),
+  //       queryString
+  //     )
+  //       .filter()
+  //       .sort()
+  //       .paginate();
+  //     return apiFeatures;
+  //   } catch (err) {
+  //     throw err;
+  //   }
+  // }
 }

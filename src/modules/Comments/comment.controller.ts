@@ -68,10 +68,7 @@ export default class CommentController {
         user_id: (<any>req).authenticatedUser._id,
         ...req.body,
       };
-      const result = await this.commentService.createCommentReply(
-        req.params.id,
-        data
-      );
+      const result = await this.commentService.createCommentReply(data);
       const resultData: object = {
         comment: result,
       };
@@ -94,6 +91,19 @@ export default class CommentController {
     const dataBody: ICommentUpdate = { ...req.body };
 
     const result = await this.commentService.updateComment(
+      (<any>req).authenticatedUser,
+      req.params,
+      dataBody
+    );
+    const resultData: object = {
+      comment: serializerGetComment(result),
+    };
+    return successReponse(req, res, resultData, "Updated Succesfully");
+  });
+
+  public updateReply = catchAsync(async (req: Request, res: Response) => {
+    const dataBody: ICommentUpdate = { ...req.body };
+    const result = await this.commentService.updateReply(
       (<any>req).authenticatedUser,
       req.params,
       dataBody
