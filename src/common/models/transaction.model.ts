@@ -1,6 +1,8 @@
+import { number } from "joi";
 import mongoose from "mongoose";
 
 export interface ITransaction {
+  _id: string;
   user: mongoose.Types.ObjectId;
   type: string;
   tag: [mongoose.Types.ObjectId];
@@ -8,6 +10,11 @@ export interface ITransaction {
   point: number;
   createdAt: Date;
   updatedAt: Date;
+  category: mongoose.Types.ObjectId;
+  comments: [{ type: mongoose.Schema.Types.ObjectId; ref: "Comments" }];
+  favorites: [{ type: mongoose.Schema.Types.ObjectId; ref: "Users" }];
+  views: number;
+  toView: Function;
 }
 
 const schema = new mongoose.Schema<ITransaction>(
@@ -27,11 +34,23 @@ const schema = new mongoose.Schema<ITransaction>(
       type: Number,
       required: [true, "A transaction must have a point"],
     },
+    views: { type: Number, default: 0 },
+    category: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Categories",
+      default: "62eba29fc8e5860fe3f21845",
+    },
+    comments: [{ type: mongoose.Schema.Types.ObjectId, ref: "Comments" }],
+    favorites: [{ type: mongoose.Schema.Types.ObjectId, ref: "Users" }],
   },
   {
     timestamps: true,
   }
 );
+
+schema.methods.toView = async function (): Promise<Error | number> {
+  return ++this.views && this.save();
+};
 
 export const Transaction: mongoose.Model<ITransaction> =
   mongoose.model<ITransaction>("Transaction", schema);

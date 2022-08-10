@@ -3,7 +3,7 @@ import AuthRoute from "./Authentication/auth.route";
 import UserRouter from "./User/user.route";
 import BranchRoute from "./Branch/branch.route";
 import CategoryRoute from "./Category/category.route";
-import DocumentRoute from "./Category/category.route";
+import DocumentRoute from "./Document/document.route";
 import ProductRouter from "./Products/product.route";
 import RedemptionRouter from "./Redemptions/redemption.route";
 import TagRouter from "./Tags/tag.route";

@@ -3,7 +3,7 @@ import Comment, { IComment } from "../../common/models/comment.model";
 import Post from "../../common/models/post.model";
 import { BaseRepository } from "../../common/repository/base.repository";
 import AppError from "../../utils/appError";
-
+import { Transaction } from "../../common/models/transaction.model";
 import { ErrorMessages, ErrorResponsesCode } from "../../utils/constants";
 
 import ApiFeatures from "../../utils/apiFeatures";
@@ -78,6 +78,25 @@ export default class CommentService extends BaseRepository<IComment> {
       throw err;
     }
   }
+
+  async createCommentTransaction(data: any): Promise<any> {
+    try {
+      const transaction = await Transaction.findById(data.parent_id);
+      if (transaction) {
+        const comment = await this.create(data);
+        transaction.comments.push(comment.id);
+        return await transaction.save();
+      } else {
+        throw new AppError(
+          ErrorResponsesCode.BAD_REQUEST,
+          ErrorMessages.BAD_REQUEST
+        );
+      }
+    } catch (err) {
+      throw err;
+    }
+  }
+
   async createCommentReply(data: any): Promise<any> {
     try {
       const { parent_id } = data;
