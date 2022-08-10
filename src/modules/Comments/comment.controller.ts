@@ -25,6 +25,19 @@ export default class CommentController {
     return successReponse(req, res, resultData, "Create Successfully", 201);
   });
 
+  public createCommentTransaction = catchAsync(
+    async (req: Request, res: Response) => {
+      const data: ICommentCreate = {
+        user_id: (<any>req).authenticatedUser._id,
+        ...req.body,
+      };
+      const result = await this.commentService.createCommentTransaction(data);
+      const resultData: object = {
+        comment: result,
+      };
+      return successReponse(req, res, resultData, "Create Successfully", 201);
+    }
+  );
 
   public getAllComments = catchAsync(async (req: Request, res: Response) => {
     const results = await this.commentService.getAllComments(req.query);

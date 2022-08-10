@@ -41,8 +41,10 @@ import validate from "../../middlewares/validate.middleware";
 import { create } from "./transaction.schema";
 import TransactionController from "./transaction.controller";
 import { isAuthen, isAuthor } from "../../middlewares/authen.middleware";
-
+import CommentController from "./../../modules/Comments/comment.controller";
+import * as commentValidation from "./../../modules/Comments/comment.schema";
 const transactionController = new TransactionController();
+const commentController = new CommentController();
 const router = express.Router();
 
 router
@@ -53,6 +55,13 @@ router.route("/top/receivers").get(transactionController.getTopReceivers);
 router.route("/top/givers").get(transactionController.getTopGivers);
 router.route("/all").get(transactionController.getAllTransactions);
 router.route("/posts").get(transactionController.getTransactionsTypeGive);
+router
+  .route("/comment")
+  .post(
+    isAuthen,
+    validate(commentValidation.create),
+    commentController.createCommentTransaction
+  );
 router.route("/:id").get(isAuthen, transactionController.getTransaction);
 router.route("/:id/to-view").patch(isAuthen, transactionController.toView);
 router
