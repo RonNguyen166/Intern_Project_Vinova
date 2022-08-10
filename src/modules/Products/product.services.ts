@@ -26,7 +26,10 @@ export default class ProductService {
 
   public async getAllProductByBranchId(branchid: string): Promise<IProduct[]> {
     try {
-      const products = await Product.find({ branch_id: branchid });
+      const products = await Product.find({
+        branch_id: branchid,
+        status: true,
+      });
       if (!products) throw "Cannot get products with that branch id";
       return products;
     } catch (err) {
@@ -73,7 +76,12 @@ export default class ProductService {
   }
   public async deleteProduct(id: string): Promise<void> {
     try {
-      await Product.findByIdAndDelete(id);
+      const product: IProduct | null = await Product.findOne({ _id: id });
+      if (!product) {
+        throw "Product not found";
+      }
+      product.status = false;
+      this.updateProduct(product._id, product);
     } catch (err) {
       throw err;
     }
