@@ -7,6 +7,7 @@ const create = Joi.object({
     content: Joi.string().required(),
   }),
 });
+
 const getAll = Joi.object({
   query: Joi.object().keys({
     content: Joi.string().required(),
