@@ -1,23 +1,29 @@
 import express from "express";
 import ProductService from "./product.services";
-import {IResultProduct, serializerProduct} from "./product.serializer";
-import {s3Upload, s3GetUpload, s3DeleteUpload} from "../../common/services/upload2.service";
+import { IResultProduct, serializerProduct } from "./product.serializer";
+import {
+  s3Upload,
+  s3GetUpload,
+  s3DeleteUpload,
+} from "../../common/services/upload2.service";
 import { IProduct } from "../../common/models/product.model";
 import { ICreateProduct } from "./product.interface";
 
 export default class ProductController {
   private productService: ProductService = new ProductService();
-  //public s3Upload: S3Upload = new S3Upload(); 
+  //public s3Upload: S3Upload = new S3Upload();
   public getAllProduct = async <ProductController>(
     req: express.Request,
     res: express.Response,
     next: express.NextFunction
   ): Promise<express.Response> => {
     try {
-      const products: IProduct[] = await this.productService.getAllProduct(req.query);
+      const products: IProduct[] = await this.productService.getAllProduct(
+        req.query
+      );
       const serializedResults = products.map((ele: IProduct) =>
-      serializerProduct(ele)
-    );
+        serializerProduct(ele)
+      );
       return res.status(200).json({
         status: "success",
         length: serializedResults.length,
@@ -39,8 +45,10 @@ export default class ProductController {
     next: express.NextFunction
   ): Promise<express.Response> => {
     try {
-      const product: IProduct = await this.productService.getProduct(req.params.id);
-      if(!product){
+      const product: IProduct = await this.productService.getProduct(
+        req.params.id
+      );
+      if (!product) {
         throw "Cannot get product";
       }
       //const photoURL = await s3GetUpload(product.photo);
@@ -49,10 +57,10 @@ export default class ProductController {
 
       return res.status(200).json({
         status: "success",
-        data:{
+        data: {
           product,
           //url: photoURL
-        }
+        },
       });
     } catch (err) {
       return res.status(400).json({
@@ -72,12 +80,12 @@ export default class ProductController {
         throw "Please login to get access";
       }
       //console.log(req.body);
-      if(req.file){
+      if (req.file) {
         const url = await s3Upload(req.file);
         req.body.photo = url;
       }
-      let bodyObj: ICreateProduct = { ...req.body }; 
-      //console.log(bodyObj);     
+      let bodyObj: ICreateProduct = { ...req.body };
+      //console.log(bodyObj);
       bodyObj.user = req.authenticatedUser._id;
 
       const product = await this.productService.createProduct(bodyObj);

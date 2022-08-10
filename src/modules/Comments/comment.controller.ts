@@ -25,6 +25,7 @@ export default class CommentController {
     return successReponse(req, res, resultData, "Create Successfully", 201);
   });
 
+
   public getAllComments = catchAsync(async (req: Request, res: Response) => {
     const results = await this.commentService.getAllComments(req.query);
     const serializedResults = results.map((ele: any) =>
