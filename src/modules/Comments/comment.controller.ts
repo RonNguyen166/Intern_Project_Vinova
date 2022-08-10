@@ -100,7 +100,13 @@ export default class CommentController {
     };
     return successReponse(req, res, resultData, "Updated Succesfully");
   });
-
+  public getReply = catchAsync(async (req: Request, res: Response) => {
+    const result = await this.commentService.getReply(req.params);
+    const resultData: object = {
+      comment: serializerGetComment(result),
+    };
+    return successReponse(req, res, resultData, "Get Succesfully");
+  });
   public updateReply = catchAsync(async (req: Request, res: Response) => {
     const dataBody: ICommentUpdate = { ...req.body };
     const result = await this.commentService.updateReply(
@@ -113,9 +119,16 @@ export default class CommentController {
     };
     return successReponse(req, res, resultData, "Updated Succesfully");
   });
-
   public deleteComment = catchAsync(async (req: Request, res: Response) => {
     await this.commentService.deleteComment(
+      (<any>req).authenticatedUser,
+      req.params
+    );
+    return successReponse(req, res, { isDelete: true }, "Deleted Succesfully");
+  });
+
+  public deleteReply = catchAsync(async (req: Request, res: Response) => {
+    await this.commentService.deleteReply(
       (<any>req).authenticatedUser,
       req.params
     );

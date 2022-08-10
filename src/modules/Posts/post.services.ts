@@ -62,6 +62,7 @@ export default class PostService extends BaseRepository<IPost> {
           select: "-isDelete -__v",
           options: { sort: { created_at: 1 } },
         })
+        .sort({ created_at: -1 })
         .exec();
       return posts;
     } catch (err) {
@@ -76,7 +77,7 @@ export default class PostService extends BaseRepository<IPost> {
       let _size = size ? parseInt(size) : 10;
       let posts, totalRows, finalFilter: object;
       const _sortBy: string = sortBy ? sortBy : "created_at";
-      const _orderBy: number = orderBy ? parseInt(orderBy) : 1;
+      const _orderBy: number = orderBy ? parseInt(orderBy) : -1;
       const sorting: any = { [_sortBy]: _orderBy };
       if (search) {
         finalFilter = {
@@ -124,9 +125,9 @@ export default class PostService extends BaseRepository<IPost> {
     }
   }
 
-  async getPost(filter: any): Promise<any> {
+  async getPost(user: any, filter: any): Promise<any> {
     try {
-      const post = Post.findOne(filter)
+      const post = await Post.findOne(filter)
         .populate("tags", "name")
         .populate("category", "name")
         .populate("user_id", "fullName email photo")
@@ -140,6 +141,11 @@ export default class PostService extends BaseRepository<IPost> {
         .exec();
       if (!post) {
         throw new AppError(ErrorResponsesCode.NOT_FOUND, "Post not Exist");
+      } else {
+        const isAccess = (<any>post).user_id.equals(user._id) || user.isAdmin;
+        if (!isAccess) {
+          await (<any>post).toView();
+        }
       }
       return post;
     } catch (err) {
@@ -149,71 +155,94 @@ export default class PostService extends BaseRepository<IPost> {
 
   async updatePost(postId: string, user: any, data: any): Promise<any> {
     try {
-      let filter: object = { _id: postId, isDelete: false };
-      if (!user.isAmin) {
-        filter = { _id: postId, user_id: user._id, isDelete: false };
-      }
-      const postOld = await Post.findOne(filter);
+      // let filter: object = { _id: postId, isDelete: false };
+      // if (!user.isAmin) {
+      //   filter = { _id: postId, user_id: user._id, isDelete: false };
+      // }
+      let postOld = await Post.findOne({ _id: postId });
       if (!postOld) {
         throw new AppError(
           ErrorResponsesCode.BAD_REQUEST,
           ErrorMessages.BAD_REQUEST
         );
+      } else {
+        const isAccess =
+          (<any>postOld).user_id.equals(user._id) || user.isAdmin;
+        if (isAccess) {
+          if (postOld.tags.length) {
+            await Promise.all(
+              postOld.tags.map(async (ele: any) => {
+                const tag = await Tag.findById(ele);
+                await tag?.decreaseAmount();
+              })
+            );
+          }
+          const { tags } = data;
+          if (tags) {
+            let arrayTags = tags.split("#").splice(1);
+            arrayTags = await Promise.all(
+              arrayTags.map(async (ele: any) => {
+                let tag = await Tag.findOne({ name: ele });
+                if (tag) {
+                  tag.increaseAmount();
+                } else {
+                  tag = await Tag.create({ name: ele });
+                }
+                return tag._id;
+              })
+            );
+            data.tags = arrayTags;
+          }
+
+          const post = await Post.findByIdAndUpdate(postId, data, { new: true })
+            .populate("tags", "name")
+            .populate("category", "name")
+            .populate("user_id", "fullName email photo")
+            .populate("favorites", "fullName email photo")
+            .populate({
+              path: "comments",
+              select: "-isDelete -__v",
+              options: { sort: { created_at: 1 } },
+            })
+            .exec();
+          return post;
+        } else {
+          throw new AppError(
+            ErrorResponsesCode.BAD_REQUEST,
+            "You do not have permission to perform this feature."
+          );
+        }
       }
-      if (postOld?.tags.length) {
-        await Promise.all(
-          postOld.tags.map(async (ele: any) => {
-            const tag = await Tag.findById(ele);
-            await tag?.decreaseAmount();
-          })
-        );
-      }
-      const { tags } = data;
-      if (tags) {
-        let arrayTags = tags.split("#").splice(1);
-        arrayTags = await Promise.all(
-          arrayTags.map(async (ele: any) => {
-            let tag = await Tag.findOne({ name: ele });
-            if (tag) {
-              tag.increaseAmount();
-            } else {
-              tag = await Tag.create({ name: ele });
-            }
-            return tag._id;
-          })
-        );
-        data.tags = arrayTags;
-      }
-      const post = await Post.findByIdAndUpdate(postId, data, { new: true })
-        .populate("tags", "name")
-        .populate("category", "name")
-        .populate("user_id", "fullName email photo")
-        .populate("favorites", "fullName email photo")
-        .populate({
-          path: "comments",
-          select: "-isDelete -__v",
-          options: { sort: { created_at: 1 } },
-        })
-        .exec();
-      return post;
     } catch (err) {
       throw err;
     }
   }
   async deletePost(postId: string, user: any): Promise<any> {
     try {
-      let filter: object = { _id: postId };
-      if (!user.isAdmin) {
-        filter = { _id: postId, user_id: user._id };
+      const post = await this.getOne({ _id: postId });
+      if (!post) {
+        throw new AppError(
+          ErrorResponsesCode.BAD_REQUEST,
+          ErrorMessages.BAD_REQUEST
+        );
+      } else {
+        const isAccess = (<any>post).user_id.equals(user._id) || user.isAdmin;
+        if (isAccess) {
+          await Promise.all(
+            post.tags.map(async (ele: any) => {
+              const tag = await Tag.findById(ele);
+              await tag?.decreaseAmount();
+            })
+          );
+          post.isDelete = true;
+          await post.save();
+        } else {
+          throw new AppError(
+            ErrorResponsesCode.BAD_REQUEST,
+            "You do not have permission to perform this feature."
+          );
+        }
       }
-      const post = await this.delete(filter);
-
-      Promise.all(
-        post.tags.map(async (ele: any) => {
-          const tag = await Tag.findById(ele);
-          await tag?.decreaseAmount();
-        })
-      );
     } catch (err) {
       throw err;
     }
@@ -242,15 +271,15 @@ export default class PostService extends BaseRepository<IPost> {
     }
   }
 
-  async toView(postId: string): Promise<any> {
-    try {
-      const post = await this.getOne({ _id: postId });
-      if (!post) {
-        throw new AppError(ErrorResponsesCode.NOT_FOUND, "Post not found");
-      }
-      await post.toView();
-    } catch (err) {
-      throw err;
-    }
-  }
+  // async toView(postId: string): Promise<any> {
+  //   try {
+  //     const post = await this.getOne({ _id: postId });
+  //     if (!post) {
+  //       throw new AppError(ErrorResponsesCode.NOT_FOUND, "Post not found");
+  //     }
+  //     await post.toView();
+  //   } catch (err) {
+  //     throw err;
+  //   }
+  // }
 }

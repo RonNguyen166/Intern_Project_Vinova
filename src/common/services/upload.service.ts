@@ -76,12 +76,10 @@ export default class S3Upload {
 
   async get(url: string) {
     const imageName = url.slice(url?.indexOf("uploads"));
-    console.log(imageName);
     const param = {
       Bucket: process.env.AWS_BUCKET_NAME!,
       Key: imageName,
     };
-
     return await getSignedUrl(this.s3Client, new GetObjectCommand(param), {
       expiresIn: 3600,
     });

@@ -52,7 +52,8 @@ const UserSchema: Schema = new Schema<IUser>(
     country: String,
     photo: {
       type: String,
-      default: "default.png",
+      default:
+        "https://intern-nodejs-vinova.s3.ap-southeast-1.amazonaws.com/uploads/default.png",
     },
     role: {
       type: String,
