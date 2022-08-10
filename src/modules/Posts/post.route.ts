@@ -62,7 +62,7 @@ export default class PostRoute {
       "/comments",
       isAuthen,
       validate(commentValidation.create),
-      this.commentController.createComment
+      this.commentController.createCommentPost
     );
 
     this.router

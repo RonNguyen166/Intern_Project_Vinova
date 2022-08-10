@@ -61,7 +61,7 @@ export default class CommentService extends BaseRepository<IComment> {
     }
     return comment;
   }
-  async createComment(data: any): Promise<any> {
+  async createCommentPost(data: any): Promise<any> {
     try {
       const post = await Post.findById(data.parent_id);
       if (post) {
