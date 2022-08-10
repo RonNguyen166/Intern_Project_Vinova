@@ -2,15 +2,15 @@ import nodemailer, { Transporter, TransportOptions } from "nodemailer";
 
 export default class Email {
   newTransport(): Transporter {
-    if (process.env.NODE_ENV === "production") {
-      return nodemailer.createTransport({
-        service: "SendGrid",
-        auth: {
-          user: process.env.SENDGRID_USERNAME,
-          pass: process.env.SENDGRID_PASSWORD,
-        },
-      });
-    }
+    // if (process.env.NODE_ENV === "production") {
+    //   return nodemailer.createTransport({
+    //     service: "SendGrid",
+    //     auth: {
+    //       user: process.env.SENDGRID_USERNAME,
+    //       pass: process.env.SENDGRID_PASSWORD,
+    //     },
+    //   });
+    // }
 
     return nodemailer.createTransport({
       host: process.env.SMTP_HOST,
