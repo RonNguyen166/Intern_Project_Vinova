@@ -29,9 +29,10 @@ export default class TransactionService {
       throw err;
     }
   }
-  public async getTransaction(id: string): Promise<ITransaction> {
+  public async getTransaction(id: string, user: any): Promise<ITransaction> {
     try {
-      const transaction = await Transaction.findById(id)
+      //console.log("ID: " + id);
+      const transaction = await Transaction.findOne({ id })
         .populate("user", "alias name")
         .populate("tag", "-createdAt -updatedAt -__v")
         .populate("category", "name")
@@ -41,12 +42,16 @@ export default class TransactionService {
           select: "-isDelete -__v",
           options: { sort: { created_at: 1 } },
         });
-
+      //console.log(transaction);
       if (!transaction) {
         throw new AppError(
           ErrorResponsesCode.NOT_FOUND,
           "Transaction not found"
         );
+      }
+      const isAccess = (<any>transaction).user.equals(user._id) || user.isAdmin;
+      if (!isAccess) {
+        await (<any>transaction).toView();
       }
       return transaction;
     } catch (err) {
@@ -121,7 +126,7 @@ export default class TransactionService {
           },
         },
         {
-          $sort: { count: -1 },
+          $sort: { pointreceive: -1 },
         },
         {
           $limit: 10,
@@ -137,7 +142,16 @@ export default class TransactionService {
     try {
       const transactions = await Transaction.find({
         type: "Give Pt",
-      });
+      })
+        .populate("user", "alias name photo")
+        .populate("tag", "-createdAt -updatedAt -__v -isDelete")
+        .populate("category", "name")
+        .populate("favorites", "fullName email photo")
+        .populate({
+          path: "comments",
+          select: "-isDelete -__v",
+          options: { sort: { created_at: 1 } },
+        });
       return transactions;
     } catch (err) {
       throw err;
@@ -175,7 +189,7 @@ export default class TransactionService {
           },
         },
         {
-          $sort: { count: -1 },
+          $sort: { pointgive: 1 },
         },
         {
           $limit: 10,
@@ -214,7 +228,7 @@ export default class TransactionService {
       if (!user) {
         throw new AppError(ErrorResponsesCode.BAD_REQUEST, "Please login");
       }
-      const transaction = await this.getTransaction(transactionId);
+      const transaction = await this.getTransaction(transactionId, user);
       if (!transaction)
         throw new AppError(ErrorResponsesCode.NOT_FOUND, "Post not found");
 
@@ -232,6 +246,7 @@ export default class TransactionService {
     }
   }
 
+  /*
   public async toView(transactionId: string): Promise<any> {
     try {
       const transaction = await this.getTransaction(transactionId);
@@ -243,4 +258,5 @@ export default class TransactionService {
       throw err;
     }
   }
+  */
 }

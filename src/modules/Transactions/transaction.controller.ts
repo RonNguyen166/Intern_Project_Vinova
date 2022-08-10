@@ -41,7 +41,8 @@ export default class TransactionController {
   ): Promise<express.Response> => {
     try {
       const transaction = await this.transactionService.getTransaction(
-        req.params.id
+        req.params.id,
+        (<any>req).authenticatedUser
       );
       return res.status(200).json({
         status: "success",
@@ -326,7 +327,7 @@ export default class TransactionController {
       });
     }
   };
-
+  /*
   public toView = async (req: express.Request, res: express.Response) => {
     try {
       await this.transactionService.toView(req.params.id);
@@ -341,7 +342,7 @@ export default class TransactionController {
       });
     }
   };
-
+  */
   public toFavorite = async (req: express.Request, res: express.Response) => {
     try {
       await this.transactionService.toFavorite(

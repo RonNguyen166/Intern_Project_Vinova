@@ -67,7 +67,7 @@ router.route("/:id").get(isAuthen, transactionController.getTransaction);
 router
   .route("/:parentId/comments/:commentId")
   .delete(isAuthen, commentController.deleteCommentTransaction);
-router.route("/:id/to-view").patch(isAuthen, transactionController.toView);
+//router.route("/:id/to-view").patch(isAuthen, transactionController.toView);
 router
   .route("/:id/to-favorite")
   .patch(isAuthen, transactionController.toFavorite);
