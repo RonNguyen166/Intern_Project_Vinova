@@ -96,7 +96,7 @@ export default class ProductController {
         },
       });
     } catch (err) {
-      //console.log(err);
+      console.log(err);
       return res.status(400).json({
         status: "error",
         message: "Cannot create product",
