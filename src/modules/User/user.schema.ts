@@ -1,28 +1,20 @@
 import Joi, { ObjectSchema } from "joi";
-import { objectId } from "../../common/validation/custom.vaidation";
+import {
+  objectId,
+  capitalize,
+  password,
+} from "../../common/validation/custom.vaidation";
 import { Roles } from "../../utils/constants";
-
-function password(value: string, helpers: any) {
-  if (value.length < 6) {
-    return helpers.message("password must be at least 6 characters");
-  }
-  if (!value.match(/\d/) || !value.match(/[a-zA-Z]/)) {
-    return helpers.message(
-      "password must contain at least 1 letter or 1 number"
-    );
-  }
-  return value;
-}
 
 const create = Joi.object({
   body: Joi.object().keys({
-    fullName: Joi.string().required(),
-    alias: Joi.string().required(),
+    fullName: Joi.string().required().trim(),
+    alias: Joi.string().required().trim().custom(capitalize),
     team: Joi.string().required(),
     gender: Joi.boolean().required(),
     dob: Joi.date().required(),
     country: Joi.string().required(),
-    email: Joi.string().required().email(),
+    email: Joi.string().required().trim().email(),
     point: Joi.object().keys({
       givePoint: Joi.number().required(),
       redeemPoint: Joi.number().required(),

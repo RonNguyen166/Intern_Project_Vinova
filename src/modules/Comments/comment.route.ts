@@ -10,12 +10,18 @@ export default class DocumentRoute {
     this.intializeRoute();
   }
   public intializeRoute(): void {
-    this.router.post(
-      "/reply",
-      isAuthen,
-      validate(create),
-      this.commentController.createCommentReply
-    );
+    this.router
+      .route("/reply")
+      .post(
+        isAuthen,
+        validate(create),
+        this.commentController.createCommentReply
+      );
+
+    this.router
+      .route("/:parentId/reply")
+      .get(this.commentController.getAllReplies);
+
     this.router
       .route("/:parentId/reply/:replyId")
       .get(this.commentController.getReply)

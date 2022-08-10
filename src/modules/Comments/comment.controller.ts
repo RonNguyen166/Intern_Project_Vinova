@@ -76,6 +76,19 @@ export default class CommentController {
     return successReponse(req, res, resultData, "Get Successfully");
   });
 
+  public getAllReplies = catchAsync(async (req: Request, res: Response) => {
+    const results = await this.commentService.getAllReplies(
+      req.params.parentId
+    );
+    const serializedResults = results.map((ele: any) =>
+      ele.id ? serializerGetComment(ele) : serializerComment(ele)
+    );
+    const resultData: object = {
+      comments: serializedResults,
+    };
+    return successReponse(req, res, resultData, "Get Successfully");
+  });
+
   public createCommentReply = catchAsync(
     async (req: Request, res: Response) => {
       const data: ICommentCreate = {

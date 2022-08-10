@@ -13,8 +13,7 @@ export default class PostService extends BaseRepository<IPost> {
   async createPost(data: any): Promise<any> {
     try {
       const { tags } = data;
-
-      let arrayTags = tags.split("#").splice(1);
+      let arrayTags = tags.split(" ");
       arrayTags = await Promise.all(
         arrayTags.map(async (ele: any) => {
           let tag = await Tag.findOne({ name: ele });
@@ -179,7 +178,7 @@ export default class PostService extends BaseRepository<IPost> {
           }
           const { tags } = data;
           if (tags) {
-            let arrayTags = tags.split("#").splice(1);
+            let arrayTags = tags.split(" ");
             arrayTags = await Promise.all(
               arrayTags.map(async (ele: any) => {
                 let tag = await Tag.findOne({ name: ele });

@@ -4,7 +4,7 @@ import { objectId } from "../../common/validation/custom.vaidation";
 const create = Joi.object({
   body: Joi.object().keys({
     title: Joi.string().required(),
-    tags: Joi.string(),
+    tags: Joi.string().trim(),
     content: Joi.string().required(),
     category: Joi.string().custom(objectId),
   }),
@@ -37,7 +37,7 @@ const updateOne = Joi.object({
   }),
   body: Joi.object().keys({
     title: Joi.string(),
-    tags: Joi.string(),
+    tags: Joi.string().trim(),
     content: Joi.string(),
     category: Joi.string().custom(objectId),
   }),

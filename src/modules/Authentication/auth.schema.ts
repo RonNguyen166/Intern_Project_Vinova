@@ -1,20 +1,10 @@
 import Joi from "joi";
-
-function password(value: string, helpers: any) {
-  if (value.length < 6) {
-    return helpers.message("password must be at least 6 characters");
-  }
-  if (!value.match(/\d/) || !value.match(/[a-zA-Z]/)) {
-    return helpers.message(
-      "password must contain at least 1 letter or 1 number"
-    );
-  }
-  return value;
-}
+import { capitalize, password } from "../../common/validation/custom.vaidation";
 
 const register = Joi.object({
   body: Joi.object().keys({
     fullName: Joi.string().required(),
+    alias: Joi.string().required().trim().custom(capitalize),
     email: Joi.string().required().email(),
     password: Joi.string().required().min(6).max(40).custom(password),
     passwordConfirm: Joi.any()

@@ -61,6 +61,11 @@ export default class CommentService extends BaseRepository<IComment> {
     }
     return comment;
   }
+
+  async getAllReplies(parentId: string): Promise<any> {
+    const replies = await Comment.find({ parent_id: parentId, reply: true });
+    return replies;
+  }
   async createCommentPost(data: any): Promise<any> {
     try {
       const post = await Post.findById(data.parent_id);
