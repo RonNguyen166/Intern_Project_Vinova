@@ -39,12 +39,6 @@ export default class DocumentRoute {
       );
     this.router
       .route("/")
-      .get(isAuthen, validate(getAll), this.commentController.getAllComments)
-      .post(
-        isAuthen,
-        isAuthor,
-        validate(create),
-        this.commentController.createComment
-      );
+      .get(isAuthen, validate(getAll), this.commentController.getAllComments);
   }
 }
