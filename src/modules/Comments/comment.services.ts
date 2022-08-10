@@ -258,6 +258,41 @@ export default class CommentService extends BaseRepository<IComment> {
     }
   }
 
+  async deleteCommentTransaction(user: any, params: any) {
+    try {
+      const { parentId, commentId } = params;
+      const comment = await this.getOne({
+        _id: commentId,
+        parent_id: parentId,
+      });
+      if (!comment) {
+        throw new AppError(
+          ErrorResponsesCode.BAD_REQUEST,
+          ErrorMessages.BAD_REQUEST
+        );
+      }
+      const isAccess = (<any>comment).user_id.equals(user._id) || user.isAdmin;
+      if (isAccess) {
+        await Transaction.findByIdAndUpdate(comment.parent_id, {
+          $pull: { comments: comment.id },
+        });
+        await Promise.all(
+          comment.replies.map(async (reply: any) => {
+            await Comment.findByIdAndDelete(reply);
+          })
+        );
+        await comment.remove();
+      } else {
+        throw new AppError(
+          ErrorResponsesCode.BAD_REQUEST,
+          "You do not have permission to perform this feature."
+        );
+      }
+    } catch (err) {
+      throw err;
+    }
+  }
+
   // async getCommentsByPostId(postId: string, queryString: object): Promise<any> {
   //   try {
   //     const apiFeatures = new ApiFeatures(

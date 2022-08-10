@@ -154,6 +154,20 @@ export default class CommentController {
     return successReponse(req, res, { isDelete: true }, "Deleted Succesfully");
   });
 
+  public deleteCommentTransaction = catchAsync(
+    async (req: Request, res: Response) => {
+      await this.commentService.deleteCommentTransaction(
+        (<any>req).authenticatedUser,
+        req.params
+      );
+      return successReponse(
+        req,
+        res,
+        { isDelete: true },
+        "Deleted Succesfully"
+      );
+    }
+  );
   public deleteReply = catchAsync(async (req: Request, res: Response) => {
     await this.commentService.deleteReply(
       (<any>req).authenticatedUser,

@@ -56,13 +56,17 @@ router.route("/top/givers").get(transactionController.getTopGivers);
 router.route("/all").get(transactionController.getAllTransactions);
 router.route("/posts").get(transactionController.getTransactionsTypeGive);
 router
-  .route("/comment")
+  .route("/comments")
   .post(
     isAuthen,
     validate(commentValidation.create),
     commentController.createCommentTransaction
   );
+
 router.route("/:id").get(isAuthen, transactionController.getTransaction);
+router
+  .route("/:parentId/comments/:commentId")
+  .delete(isAuthen, commentController.deleteCommentTransaction);
 router.route("/:id/to-view").patch(isAuthen, transactionController.toView);
 router
   .route("/:id/to-favorite")
