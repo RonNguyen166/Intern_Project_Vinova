@@ -87,12 +87,18 @@ export default class UserController {
   });
 
   public editProfile = catchAsync(async (req: Request, res: Response) => {
-    if (req.file?.mimetype.startsWith("image")) {
-      const url = await this.s3Upload.put(req.file);
-      req.body.photo = url;
-    } else {
-      throw new AppError(ErrorResponsesCode.BAD_REQUEST, "File upload failed");
+    if (req.file) {
+      if (req.file?.mimetype.startsWith("image")) {
+        const url = await this.s3Upload.put(req.file);
+        req.body.photo = url;
+      } else {
+        throw new AppError(
+          ErrorResponsesCode.BAD_REQUEST,
+          "File upload failed"
+        );
+      }
     }
+
     const dataBody: IUserProfile = { ...req.body };
     const result = await this.userService.editProfile(
       (<any>req).authenticatedUser._id,

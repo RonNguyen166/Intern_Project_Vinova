@@ -22,23 +22,23 @@ export default class DocumentRoute {
       .patch(isAuthen, this.commentController.updateReply)
       .delete(isAuthen, this.commentController.deleteReply);
 
-    this.router
-      .route("/:id")
-      .get(isAuthen, validate(getOne), this.commentController.getComment)
-      .patch(
-        isAuthen,
-        isAuthor,
-        validate(updateOne),
-        this.commentController.updateComment
-      )
-      .delete(
-        isAuthen,
-        isAuthor,
-        validate(deleteOne),
-        this.commentController.deleteComment
-      );
-    this.router
-      .route("/")
-      .get(isAuthen, validate(getAll), this.commentController.getAllComments);
+    // this.router
+    //   .route("/:id")
+    //   .get(isAuthen, validate(getOne), this.commentController.getComment)
+    //   .patch(
+    //     isAuthen,
+    //     isAuthor,
+    //     validate(updateOne),
+    //     this.commentController.updateComment
+    //   )
+    //   .delete(
+    //     isAuthen,
+    //     isAuthor,
+    //     validate(deleteOne),
+    //     this.commentController.deleteComment
+    //   );
+    // this.router
+    //   .route("/")
+    //   .get(isAuthen, validate(getAll), this.commentController.getAllComments);
   }
 }

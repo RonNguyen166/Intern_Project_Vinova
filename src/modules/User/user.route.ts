@@ -19,7 +19,7 @@ export default class UserRoute {
   }
   public intializeRoute(): void {
     this.router.patch(
-      "edit-profile",
+      "/edit-profile",
       upload.single("photo"),
       isAuthen,
       validate(editProfile),

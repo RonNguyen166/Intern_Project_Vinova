@@ -13,6 +13,7 @@ export interface IUserCreate {
   photo: string;
   point: IPoint;
   role: Roles;
+  isEmailVerified: boolean;
 }
 
 export interface IUserUpdate {

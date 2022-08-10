@@ -34,6 +34,7 @@ const create = Joi.object({
       .required()
       .label("Confirm password")
       .messages({ "any.only": "{{#label}} does not match" }),
+    isEmailVerified: Joi.boolean().required(),
     role: Joi.string().valid(Roles),
   }),
 });

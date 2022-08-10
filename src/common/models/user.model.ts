@@ -20,6 +20,7 @@ export interface IUser extends IBase {
   isAdmin: boolean;
   correctPassword: Function;
   isEmailTaken: Function;
+  isAliasTaken: Function;
 }
 
 const UserSchema: Schema = new Schema<IUser>(
@@ -29,10 +30,7 @@ const UserSchema: Schema = new Schema<IUser>(
       required: true,
     },
     subName: String,
-    alias: {
-      type: String,
-      unique: true,
-    },
+    alias: String,
     email: {
       type: String,
       required: true,
@@ -58,7 +56,7 @@ const UserSchema: Schema = new Schema<IUser>(
     role: {
       type: String,
       enum: Roles,
-      default: Roles.Menber,
+      default: Roles.Member,
     },
     point: pointModel.schema,
     isEmailVerified: {
@@ -93,6 +91,11 @@ UserSchema.pre<IUser>("save", async function (next: any): Promise<void> {
   this.isAdmin = this.role === "admin";
   return next();
 });
+
+UserSchema.statics.isAliasTaken = async function (alias: string) {
+  const user = await this.findOne({ alias });
+  return !!user;
+};
 
 UserSchema.methods.correctPassword = async function (
   password: string

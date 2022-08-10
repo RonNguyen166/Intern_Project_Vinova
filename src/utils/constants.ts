@@ -12,7 +12,7 @@ export enum TXNTypes {
 
 export enum Roles {
   Admin = "admin",
-  Menber = "member",
+  Member = "member",
   ViceLead = "vice lead",
   Leader = "leader",
 }

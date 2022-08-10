@@ -80,6 +80,7 @@ export default class UserService extends BaseRepository<IUser> {
 
   async createUser(data: any): Promise<any> {
     try {
+      // is Alias
       const user = await this.create(data);
       return user;
     } catch (err) {
