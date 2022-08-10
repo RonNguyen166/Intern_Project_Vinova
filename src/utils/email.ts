@@ -28,7 +28,7 @@ export default class Email {
 
   async sendResetPasswordEmail(to: string, token: string): Promise<void> {
     const subject = "Reset password";
-    const resetPasswordUrl = `${process.env.URL_LOCAL_HOST}/v1/auth/reset-password?token=${token}`;
+    const resetPasswordUrl = `${process.env.URL_HEROKU_HOST}/v1/auth/reset-password?token=${token}`;
     const text = `Dear user,
   To reset your password, click on this link: ${resetPasswordUrl}
   If you did not request any password resets, then ignore this email.`;

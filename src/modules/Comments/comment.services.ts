@@ -223,7 +223,7 @@ export default class CommentService extends BaseRepository<IComment> {
       throw err;
     }
   }
-  async deleteComment(user: any, params: any) {
+  async deleteCommentPost(user: any, params: any) {
     try {
       const { parentId, commentId } = params;
       const comment = await this.getOne({

@@ -146,8 +146,8 @@ export default class CommentController {
     };
     return successReponse(req, res, resultData, "Updated Succesfully");
   });
-  public deleteComment = catchAsync(async (req: Request, res: Response) => {
-    await this.commentService.deleteComment(
+  public deleteCommentPost = catchAsync(async (req: Request, res: Response) => {
+    await this.commentService.deleteCommentPost(
       (<any>req).authenticatedUser,
       req.params
     );

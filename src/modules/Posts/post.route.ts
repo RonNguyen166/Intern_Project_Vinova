@@ -72,7 +72,7 @@ export default class PostRoute {
         this.commentController.getCommentByPost
       )
       .patch(isAuthen, this.commentController.updateComment)
-      .delete(isAuthen, this.commentController.deleteComment);
+      .delete(isAuthen, this.commentController.deleteCommentPost);
 
     // this.router.patch(
     //   "/:id/to-view",
