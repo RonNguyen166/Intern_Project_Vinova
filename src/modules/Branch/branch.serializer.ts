@@ -9,6 +9,14 @@ export interface IResponseBranch {
 export interface IResultBranch {
   _id: string;
   name: string;
+
+}
+
+export function serializerGetBranch(model: any): IResultBranch{
+  return {
+    _id: model._id,
+    name: model.name,
+  };
 }
 
 export function serializerBranch(model: any): IResponseBranch{
@@ -19,12 +27,5 @@ export function serializerBranch(model: any): IResponseBranch{
     updated_by: model.updated_by,
     created_at: model.created_at,
     updated_at: model.updated_at,
-  };
-}
-
-export function serializerGetBranch(model: any): IResultBranch{
-  return {
-    _id: model._id,
-    name: model.name,
   };
 }

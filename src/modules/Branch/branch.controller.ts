@@ -7,9 +7,9 @@ import { IBranchGet, IBranchUpdate } from "./branch.interface";
 import catchAsync from "../../utils/catchAsync";
 import { any } from "joi";
 
+
 export default class BranchController {
   public branchService: BranchService = new BranchService(Branch);
-
   public createBranch = catchAsync(async (req: Request, res: Response) => {
     const result = await this.branchService.createBranch(req.body);
     const resultData: object = {
@@ -29,12 +29,14 @@ export default class BranchController {
     return successReponse(req, res, resultData, "Get Successfully");
   });
 
+  
+
   public getBranch = catchAsync(async (req: Request, res: Response) => {
     const filter: object = {
       _id: req.params.id,
-      isDelete: false,
     };
     const result = await this.branchService.getBranch(filter);
+    console.log(result)
     const resultData: object = {
       branch: serializerGetBranch(result),
     };
@@ -42,14 +44,13 @@ export default class BranchController {
   });
 
   public updateBranch = catchAsync(async (req: Request, res: Response) => {
+    const dataBody: IBranchUpdate = { ...req.body };
     const filter: object = {
       _id: req.params.id,
-      isDelete: false,
     };
-    const dataBody: IBranchUpdate = { ...req.body };
     const result = await this.branchService.updateBranch(filter, dataBody);
     const resultData: object = {
-      branch: serializerGetBranch(result),
+      branch: serializerBranch(result),
     };
     return successReponse(req, res, resultData, "Updated Succesfully");
   });
@@ -57,9 +58,9 @@ export default class BranchController {
   public deleteBranch = catchAsync(async (req: Request, res: Response) => {
     const filter: object = {
       _id: req.params.id,
-      isDelete: false,
+
     };
     await this.branchService.deleteBranch(filter);
-    return successReponse(req, res, { isDelete: true }, "Updated Succesfully");
+    return successReponse(req, res, { isDelete: true }, "Delete Succesfully");
   });
 }

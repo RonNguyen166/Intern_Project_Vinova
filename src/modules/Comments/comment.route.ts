@@ -16,11 +16,12 @@ export default class DocumentRoute {
       validate(create),
       this.commentController.createCommentReply
     );
-    this.router.post(
-      "/:parentId/reply/:replyId",
-      isAuthen,
-      this.commentController.updateReply
-    );
+    this.router
+      .route("/:parentId/reply/:replyId")
+      .get(this.commentController.getReply)
+      .patch(isAuthen, this.commentController.updateReply)
+      .delete(isAuthen, this.commentController.deleteReply);
+
     this.router
       .route("/:id")
       .get(isAuthen, validate(getOne), this.commentController.getComment)

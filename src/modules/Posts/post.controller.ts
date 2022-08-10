@@ -62,7 +62,10 @@ export default class PostController {
   });
 
   public getPost = catchAsync(async (req: Request, res: Response) => {
-    const result = await this.postService.getPost({ _id: req.params.id });
+    const result = await this.postService.getPost(
+      (<any>req).authenticatedUser,
+      { _id: req.params.id, isDelete: false }
+    );
     const resultData: object = {
       post: serializerGetPost(result),
     };
@@ -90,10 +93,10 @@ export default class PostController {
     return successReponse(req, res, { isDelete: true }, "Delete Successfully");
   });
 
-  public toView = catchAsync(async (req: Request, res: Response) => {
-    await this.postService.toView(req.params.id);
-    return successReponse(req, res, undefined, "Successfully");
-  });
+  // public toView = catchAsync(async (req: Request, res: Response) => {
+  //   await this.postService.toView(req.params.id);
+  //   return successReponse(req, res, undefined, "Successfully");
+  // });
 
   public toFavorite = catchAsync(async (req: Request, res: Response) => {
     await this.postService.toFavorite(
