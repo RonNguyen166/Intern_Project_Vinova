@@ -23,11 +23,11 @@ export abstract class BaseRepository<T> implements IWrite<T>, IRead<T> {
       const filter: object = { isDelete: false };
       const results = await this.entity.find(filter).sort({ created_at: -1 });
 
-      if (!results.length)
-        throw new AppError(
-          ErrorResponsesCode.NOT_FOUND,
-          ErrorMessages.NOT_FOUND
-        );
+      // if (!results.length)
+      //   throw new AppError(
+      //     ErrorResponsesCode.NOT_FOUND,
+      //     ErrorMessages.NOT_FOUND
+      //   );
       return results;
     } catch (error) {
       throw error;
