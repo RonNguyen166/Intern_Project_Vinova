@@ -13,25 +13,37 @@ import {
 } from "./document.interface";
 import catchAsync from "../../utils/catchAsync";
 import S3Upload from "../../common/services/upload.service";
+import AppError from "../../utils/appError";
 
 export default class DocumentController {
   public documentService: DocumentService = new DocumentService(Document);
   public s3Upload: S3Upload = new S3Upload();
 
+// create Document
   public createDocument = catchAsync(async (req: Request, res: Response) => {
-    if (req.file) {
-      const url = await this.s3Upload.put(req.file);
-      req.body.image = url;
-      req.body.link = url;
+    if (req.files) {
+      if((<any>req).files.image[0].mimetype.startsWith("image")){
+        const url = await this.s3Upload.put((<any>req).files.image[0]);
+        req.body.image = url;
+
+      }if((<any>req).files.link[0].mimetype === "application/pdf"){
+        const url = await this.s3Upload.put((<any>req).files.link[0]);
+        req.body.link = url;
+      }
+      else{
+        throw new AppError(400, "Update Fail")
+      }   
     }
     const data: IDocumentCreate = req.body;
     const result = await this.documentService.createDocument(data);
+    
     const resultData: object = {
       document: serializerGetDocument(result),
     };
-    return successReponse(req, res, resultData, "Create Successfully", 201);
+    return successReponse(req, res, undefined, "Create Successfully", 201);
   });
 
+// Show ALL Documents
   public getAllDocuments = catchAsync(async (req: Request, res: Response) => {
     const results = await this.documentService.getAllDocuments();
 
@@ -41,7 +53,7 @@ export default class DocumentController {
     };
     return successReponse(req, res, resultData, "Get Successfully");
   });
-
+// get document
   public getDocument = catchAsync(async (req: Request, res: Response) => {
     const result = await this.documentService.getDocument({ _id: req.params.id });
     result.imageUrl = await this.s3Upload.get(result.image);
@@ -52,21 +64,43 @@ export default class DocumentController {
     return successReponse(req, res, resultData, "Get Succesfully");
   });
 
+// update Document
   public updateDocument = catchAsync(async (req: Request, res: Response) => {
-    if (req.file) {
-      const url = await this.s3Upload.put(req.file);
-      req.body.photo = url;
-      req.body.link = url;
+    if (req.files) {
+      // if((<any>req).files?.image[0].mimetype.startsWith("image")){
+      //   const url = await this.s3Upload.put((<any>req).files.image[0]);
+      //   req.body.image = url;
+
+      // }if((<any>req).files?.link[0].mimetype === "application/pdf"){
+      //   const url = await this.s3Upload.put((<any>req).files.link[0]);
+      //   req.body.link = url;
+      // }
+      // else{
+      //   throw new AppError(400, "Update Fail")
+      // }   
+
+      if((<any>req).files.link){
+        if((<any>req).files?.link[0].mimetype === "application/pdf"){
+          const url = await this.s3Upload.put((<any>req).files.link[0]);
+          req.body.link = url;
+        }
+      }else if((<any>req).files.image){
+        if((<any>req).files?.image[0].mimetype.startsWith("image")){
+          const url = await this.s3Upload.put((<any>req).files.image[0]);
+          req.body.image = url;
+        }
+      }
     }
-    const dataBody: IDocumentUpdate = { ...req.body };
+      const data: IDocumentCreate = req.body;
+      const result = await this.documentService.updateDocument(req.params.id, data);
+    
+      const resultData: object = {
+        document: serializerGetDocument(result),
+      }
+      return successReponse(req, res, resultData, "Create Successfully", 201);
+ });
 
-    const result = await this.documentService.updateDocument(req.params.id, dataBody);
-    const resultData: object = {
-      document: serializerDocument(result),
-    };
-    return successReponse(req, res, resultData, "Updated Succesfully");
-  });
-
+// Delete Document
   public deleteDocument = catchAsync(async (req: Request, res: Response) => {
     const document = await this.documentService.deleteDocument(req.params.id);
     await this.s3Upload.delete(document.image);

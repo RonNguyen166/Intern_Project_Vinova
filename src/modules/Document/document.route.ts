@@ -26,8 +26,7 @@ export default class DocumentRoute {
         isAuthen, 
         isAuthor, 
         validate(updateOne), 
-        upload.single("image"),
-        upload.single("link"),
+        upload.fields([{ name: 'link', maxCount: 1 }, { name: 'image', maxCount: 1 }]),
         this.documentController.updateDocument)
       .delete(
         isAuthen, 
@@ -41,10 +40,10 @@ export default class DocumentRoute {
         this.documentController.getAllDocuments)
       .post(
         isAuthen, 
-        isAuthor, 
-        upload.single("image"),
-        upload.single("link"),
-        validate(create), 
+        isAuthor,
+        upload.fields([{ name: 'link', maxCount: 1 }, { name: 'image', maxCount: 1 }]),
+        
+        
       this.documentController.createDocument);
   }
 }
