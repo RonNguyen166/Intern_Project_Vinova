@@ -14,6 +14,7 @@ import {
 import catchAsync from "../../utils/catchAsync";
 import S3Upload from "../../common/services/upload.service";
 import AppError from "../../utils/appError";
+import { link } from "joi";
 
 export default class DocumentController {
   public documentService: DocumentService = new DocumentService(Document);
@@ -83,11 +84,13 @@ export default class DocumentController {
         if((<any>req).files?.link[0].mimetype === "application/pdf"){
           const url = await this.s3Upload.put((<any>req).files.link[0]);
           req.body.link = url;
+          console.log('link')
         }
-      }else if((<any>req).files.image){
+      } if((<any>req).files.image){
         if((<any>req).files?.image[0].mimetype.startsWith("image")){
           const url = await this.s3Upload.put((<any>req).files.image[0]);
           req.body.image = url;
+          console.log('image')
         }
       }
     }
