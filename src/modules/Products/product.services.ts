@@ -86,4 +86,19 @@ export default class ProductService {
       throw err;
     }
   }
+
+  public async getProductByBranch(id: string): Promise<IProduct[]> {
+    try {
+      const products: IProduct[] | null = await Product.find({
+        branch_id: id,
+        status: true,
+      });
+      if (!products) {
+        throw "Product not found";
+      }
+      return products;
+    } catch (err) {
+      throw err;
+    }
+  }
 }
