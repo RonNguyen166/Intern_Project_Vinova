@@ -150,14 +150,14 @@ export default class AdminRoute {
       );
 
     this.router
-      .route("/braches")
+      .route("/branches")
       .get(
         validate(branchValidation.getAll),
         this.branchController.getAllBranchs
       )
       .post(
         validate(branchValidation.create),
-        this.branchController.deleteBranch
+        this.branchController.createBranch
       );
 
     this.router
@@ -204,9 +204,12 @@ export default class AdminRoute {
     );
 
     this.router.get(
-      "/top/receivers",
+      "/transactions/top/receivers",
       this.transactionController.getTopReceivers
     );
-    this.router.get("/top/givers", this.transactionController.getTopGivers);
+    this.router.get(
+      "/transactions/top/givers",
+      this.transactionController.getTopGivers
+    );
   }
 }
