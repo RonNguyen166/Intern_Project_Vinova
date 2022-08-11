@@ -7,7 +7,7 @@ const userService = new UserService(Users);
 export default class CronExec {
   constructor() {
     cron.schedule(
-      "0 0 1 * *",
+      "* * * * *",
       async () => {
         try {
           const users = await userService.getAllUsers();
