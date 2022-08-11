@@ -7,9 +7,10 @@ const userService = new UserService(Users);
 export default class CronExec {
   constructor() {
     cron.schedule(
-      "* * * * *",
+      "*/5 * * * * *",
       async () => {
         try {
+          console.log("CRON");
           const users = await userService.getAllUsers();
           for (let i = 0; i < users.length; i++) {
             if (users[i].point) {
