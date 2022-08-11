@@ -30,6 +30,7 @@ UPDATE method for testing purposes only
 DELETE method for testing purposes only
 */
 router.route("/top_redeem").get(redemptionController.getTopRedeem);
+router.route("/branch/:id/").get(productController.getProductByBranch);
 router
   .route("/:id")
   .get(productController.getProduct)

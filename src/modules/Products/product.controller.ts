@@ -147,4 +147,26 @@ export default class ProductController {
       });
     }
   };
+
+  public getProductByBranch = async <ProductController>(
+    req: express.Request,
+    res: express.Response,
+    next: express.NextFunction
+  ): Promise<express.Response> => {
+    try {
+      const products = await this.productService.getProductByBranch(
+        req.params.id
+      );
+      return res.status(200).json({
+        status: "success",
+        length: products.length,
+        data: products,
+      });
+    } catch (err) {
+      return res.status(400).json({
+        status: "error",
+        message: err,
+      });
+    }
+  };
 }
